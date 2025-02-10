@@ -33,7 +33,7 @@ combined_df = pd.concat(dataframes, ignore_index=True)
 
 # Create a new column with random assignment of 'training', 'test', 'validation'
 np.random.seed(42)  # For reproducibility
-labels = np.random.choice(['training', 'test', 'validation'], size=len(combined_df), p=[0.8, 0.1, 0.1])
+labels = np.random.choice(['TRAIN', 'VAL', 'TEST'], size=len(combined_df), p=[0.8, 0.1, 0.1])
 combined_df.insert(0, 'set', labels)
 
 # Get the directory of the current script
