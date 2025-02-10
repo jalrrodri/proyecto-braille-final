@@ -1,10 +1,10 @@
 import os
 import cv2
-import numpy
+import numpy as np
 from matplotlib import pyplot as plt
 
 # Cargar la imagen en escala de grises
-image_path = "libroINCI/datasetprueba1/a.jpg"
+image_path = "datasets/libroINCI/datasetprueba1/a.jpg"  # Asegúrate de que esta ruta sea correcta y apunte a un archivo de imagen específico
 image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
 # Verificar si la imagen se ha cargado correctamente
@@ -42,6 +42,7 @@ else:
     plt.show()
 
     # Guardar la imagen procesada
-    output_path = "libroINCI/datasetprueba1FILTROS/processed_image.jpg"
+    output_path = "datasets/libroINCI/imagenPrueba.jpg"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     cv2.imwrite(output_path, thresholded_adaptive)
     print(f"Imagen procesada guardada en: {output_path}")

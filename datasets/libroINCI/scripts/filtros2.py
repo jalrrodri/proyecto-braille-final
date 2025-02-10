@@ -100,6 +100,6 @@ def procesar_dataset(carpeta_entrada, carpeta_salida):
                 print(f"Procesado: {archivo}")
     print("Procesamiento completado.")
 
-carpeta_de_entrada = "./libroINCI/datasetprueba1"
-carpeta_de_salida = "./libroINCI/datasetprueba1FILTROS"
+carpeta_de_entrada = "datasets/libroINCI/datasetprueba1"
+carpeta_de_salida = "datasets/libroINCI/datasetprueba1FILTROS"
 procesar_dataset(carpeta_de_entrada, carpeta_de_salida)
