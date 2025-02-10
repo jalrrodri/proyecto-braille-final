@@ -4,15 +4,13 @@ import numpy as np
 
 # List of directories containing CSV files
 csv_directories = [
-    '/path/to/csv/folder1',
-    '/path/to/csv/folder2'
+    'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/filtros/anotaciones'
     # Add more directories as needed
 ]
 
 # List of individual CSV file paths
 csv_files = [
-    '/path/to/individual/file1.csv',
-    '/path/to/individual/file2.csv'
+    'datasets/libroINCI/datasetprueba1FILTROS/anotaciones/datasetprueba1FILTROS.csv'
     # Add more individual files as needed
 ]
 
@@ -27,7 +25,7 @@ dataframes = []
 
 # Read each CSV file and append the dataframe to the list
 for file in csv_files:
-    df = pd.read_csv(file)
+    df = pd.read_csv(file, header=None)
     dataframes.append(df)
 
 # Concatenate all dataframes into one
@@ -45,6 +43,6 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 output_file = os.path.join(script_dir, 'anotaciones.csv')
 
 # Save the combined dataframe to a CSV file
-combined_df.to_csv(output_file, index=False)
+combined_df.to_csv(output_file, index=False, header=False)
 
 print(f'Combined CSV saved to {output_file}')
