@@ -11,6 +11,7 @@ csv_directories = [
 # List of individual CSV file paths
 csv_files = [
     'datasets/libroINCI/datasetprueba1FILTROS/anotaciones/datasetprueba1FILTROS.csv'
+    'datasets/kaggle/anotaciones/kaggle.csv'
     # Add more individual files as needed
 ]
 
