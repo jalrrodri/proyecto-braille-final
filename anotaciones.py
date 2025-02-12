@@ -5,12 +5,18 @@ import numpy as np
 # List of directories containing CSV files
 csv_directories = [
     'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/filtros/anotaciones'
+    'datasets/AngelinaDataset/books/mdd_cannon1/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/mdd-redmi1/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/ola/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/skazki/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/telefon/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/uploaded/traducido/filtros/anotaciones'
     # Add more directories as needed
 ]
 
 # List of individual CSV file paths
 csv_files = [
-    'datasets/libroINCI/datasetprueba1FILTROS/anotaciones/datasetprueba1FILTROS.csv'
+    'datasets/libroINCI/datasetprueba1FILTROS/anotaciones/datasetprueba1FILTROS.csv',
     'datasets/kaggle/anotaciones/kaggle.csv'
     # Add more individual files as needed
 ]
