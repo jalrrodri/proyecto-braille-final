@@ -15,7 +15,7 @@ from pathlib import Path
 # Importa matplotlib
 import matplotlib.pyplot as plt
 
-ruta_modelo = Path('modeloGuardado/optimizado/mobilenet')
+ruta_modelo = Path('modeloGuardado/optimizado/efficientdet_lite0')
 
 import tensorflow as tf
 assert tf.__version__.startswith('2')
@@ -25,8 +25,8 @@ from absl import logging
 logging.set_verbosity(logging.ERROR)
 
 spec = model_spec.get('efficientdet_lite0')
-train_data, validation_data, test_data = object_detector.DataLoader.from_csv('data/dataset.csv')
-model = object_detector.create(train_data, model_spec=spec, batch_size=8, train_whole_model=True, validation_data=validation_data)
+train_data, validation_data, test_data = object_detector.DataLoader.from_csv('anotaciones.csv')
+model = object_detector.create(train_data, model_spec=spec, epochs=100, batch_size=8, train_whole_model=True, validation_data=validation_data)
 model.evaluate(test_data)
 evaluation_results = model.export(export_dir=ruta_modelo)
 
