@@ -5,3 +5,6 @@ datasets/AngelinaDataset/books/ola
 datasets/AngelinaDataset/books/skazki
 datasets/AngelinaDataset/books/telefon
 datasets/AngelinaDataset/books/uploaded
+datasets/AngelinaDataset/handwritten/ang_redmi
+datasets/AngelinaDataset/handwritten/kov
+datasets/AngelinaDataset/handwritten/uploaded
