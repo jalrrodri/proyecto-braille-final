@@ -1,0 +1,7 @@
+datasets/AngelinaDataset/books/chudo_derevo_redmi
+datasets/AngelinaDataset/books/mdd_cannon1
+datasets/AngelinaDataset/books/mdd-redmi1
+datasets/AngelinaDataset/books/ola
+datasets/AngelinaDataset/books/skazki
+datasets/AngelinaDataset/books/telefon
+datasets/AngelinaDataset/books/uploaded

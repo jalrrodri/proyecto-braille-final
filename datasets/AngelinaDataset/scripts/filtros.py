@@ -126,9 +126,10 @@ def procesar_dataset(carpeta_entrada, carpeta_salida, carpeta_anotaciones_entrad
     
     print("Procesamiento completado.")
 
-carpeta_de_entrada = "datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/separado"
-carpeta_de_salida = "datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/filtros"
-carpeta_anotaciones_entrada = "datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/separado/anotaciones"
-carpeta_anotaciones_salida = "datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/filtros/anotaciones"
+root = 'datasets/AngelinaDataset/books/chudo_derevo_redmi'
+carpeta_de_entrada = root + "/traducido/separado"
+carpeta_de_salida = root + "/traducido/filtros"
+carpeta_anotaciones_entrada = root + "/traducido/separado/anotaciones"
+carpeta_anotaciones_salida = root + "/traducido/filtros/anotaciones"
 
 procesar_dataset(carpeta_de_entrada, carpeta_de_salida, carpeta_anotaciones_entrada, carpeta_anotaciones_salida)

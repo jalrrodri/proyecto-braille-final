@@ -2,10 +2,11 @@ import os
 import csv
 from PIL import Image
 
+root = 'datasets/AngelinaDataset/books/chudo_derevo_redmi'
 # --- Configuration ---
-input_csv_dir = 'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido'  # Directory containing the original CSV files
-output_csv_dir = 'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/separado/anotaciones'  # Directory to save the updated CSV files
-output_images_dir = 'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/separado'  # Directory where cropped images will be saved
+input_csv_dir = root + '/traducido'  # Directory containing the original CSV files
+output_csv_dir = root + '/traducido/separado/anotaciones'  # Directory to save the updated CSV files
+output_images_dir = root + '/traducido/separado'  # Directory where cropped images will be saved
 
 # Create the output directories if they don't exist
 os.makedirs(output_csv_dir, exist_ok=True)
