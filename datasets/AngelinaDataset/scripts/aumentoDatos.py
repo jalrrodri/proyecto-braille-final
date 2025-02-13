@@ -43,8 +43,8 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
 
     # Parámetros de aumento de datos
     datagen = ImageDataGenerator(
-        width_shift_range=0.2,
-        height_shift_range=0.2,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
         rotation_range=7,
         brightness_range=[0.8, 1.2],
         zoom_range=[0.8, 1.2]
