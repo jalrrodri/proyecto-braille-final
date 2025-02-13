@@ -131,7 +131,7 @@ def procesar_dataset(root):
     
     print(f"Procesamiento completado para {root}.")
 
-# List of root paths
+# Lista de rutas raíz
 root_paths = [
     "datasets/AngelinaDataset/books/chudo_derevo_redmi",
     "datasets/AngelinaDataset/books/mdd_cannon1",
@@ -145,6 +145,6 @@ root_paths = [
     "datasets/AngelinaDataset/handwritten/uploaded"
 ]
 
-# Execute the function for each root path
+# Ejecutar la función para cada ruta raíz
 for root in root_paths:
     procesar_dataset(root)

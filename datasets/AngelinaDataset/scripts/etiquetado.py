@@ -4,13 +4,13 @@ import re
 
 def convert_number_to_letter(number):
     """
-    Converts a number to its corresponding letter based on the given encode table.
+    Convierte un número a su letra correspondiente según la tabla de codificación dada.
 
     Args:
-        number: The number to be converted.
+        number: El número a convertir.
 
     Returns:
-        The corresponding letter based on the encode table.
+        La letra correspondiente según la tabla de codificación.
     """
     encode_table = {
         0: ' ',
@@ -83,23 +83,23 @@ def convert_number_to_letter(number):
 
 def contains_only_letters(s):
     """
-    Checks if a string contains only letters.
+    Verifica si una cadena contiene solo letras.
 
     Args:
-        s: The string to be checked.
+        s: La cadena a verificar.
 
     Returns:
-        True if the string contains only letters, False otherwise.
+        True si la cadena contiene solo letras, False en caso contrario.
     """
     return bool(re.match(r'^[A-Za-z]+$', s))
 
 def generate_csv(folder_path, output_folder):
     """
-    Generates CSV files from a folder containing JPEGs and corresponding CSVs, assigning labels based on another CSV file.
+    Genera archivos CSV a partir de una carpeta que contiene JPEGs y CSVs correspondientes, asignando etiquetas basadas en otro archivo CSV.
 
     Args:
-        folder_path: Path to the folder containing JPEGs and CSVs.
-        output_folder: Path to the folder where output CSV files will be saved.
+        folder_path: Ruta a la carpeta que contiene JPEGs y CSVs.
+        output_folder: Ruta a la carpeta donde se guardarán los archivos CSV de salida.
     """
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -107,40 +107,40 @@ def generate_csv(folder_path, output_folder):
     for filename in os.listdir(folder_path):
         if filename.lower().endswith(".jpg"):
             filepath = os.path.join(folder_path, filename)
-            image_path = filepath.replace("\\", "/")  # Replace backslashes with forward slashes
+            image_path = filepath.replace("\\", "/")  # Reemplazar barras invertidas con barras diagonales
 
-            # Extract label and other values from corresponding CSV file
+            # Extraer etiqueta y otros valores del archivo CSV correspondiente
             csv_filename = os.path.splitext(filename)[0] + ".csv"
             csv_filepath = os.path.join(folder_path, csv_filename)
             if not os.path.exists(csv_filepath):
-                print(f"CSV file {csv_filepath} does not exist. Skipping.")
+                print(f"El archivo CSV {csv_filepath} no existe. Omitiendo.")
                 continue
 
             data = []
             with open(csv_filepath, 'r') as csvfile:
-                csvreader = csv.reader(csvfile, delimiter=';')  # Specify delimiter
-                next(csvreader)  # Skip header row
+                csvreader = csv.reader(csvfile, delimiter=';')  # Especificar delimitador
+                next(csvreader)  # Omitir fila de encabezado
                 for row in csvreader:
-                    if len(row) < 5:  # Ensure that there are enough columns in the row
-                        print(f"Skipping {csv_filename} row due to insufficient columns.")
+                    if len(row) < 5:  # Asegurarse de que haya suficientes columnas en la fila
+                        print(f"Omitiendo fila de {csv_filename} debido a columnas insuficientes.")
                         continue
-                    label = convert_number_to_letter(int(row[4]))  # Convert number to letter based on encode table
-                    other_values = [row[i] for i in range(4)]  # Extract first four columns
-                    data.append([image_path, label] + other_values)  # Append data to list
+                    label = convert_number_to_letter(int(row[4]))  # Convertir número a letra según la tabla de codificación
+                    other_values = [row[i] for i in range(4)]  # Extraer las primeras cuatro columnas
+                    data.append([image_path, label] + other_values)  # Agregar datos a la lista
 
-            # Remove rows where the label contains numbers or special characters
+            # Eliminar filas donde la etiqueta contiene números o caracteres especiales
             data = [row for row in data if contains_only_letters(row[1])]
 
-            # Write data to CSV file
+            # Escribir datos en el archivo CSV
             output_filename = os.path.join(output_folder, os.path.splitext(filename)[0] + "_traducido.csv")
             with open(output_filename, 'w', newline='') as csvfile:
                 csvwriter = csv.writer(csvfile)
                 # csvwriter.writerow(['Label', 'Image Path', '1st Column', '2nd Column', '3rd Column', '4th Column'])
                 csvwriter.writerows(data)
 
-            print(f"CSV file generated successfully: {output_filename}")
+            print(f"Archivo CSV generado exitosamente: {output_filename}")
 
-# List of folder paths
+# Lista de rutas de carpetas
 folder_paths = [
     "datasets/AngelinaDataset/books/chudo_derevo_redmi",
     "datasets/AngelinaDataset/books/mdd_cannon1",
@@ -154,7 +154,7 @@ folder_paths = [
     "datasets/AngelinaDataset/handwritten/uploaded"
 ]
 
-# Execute generate_csv for each folder path
+# Ejecutar generate_csv para cada ruta de carpeta
 for folder_path in folder_paths:
     output_folder = folder_path + "/traducido"
     generate_csv(folder_path, output_folder)

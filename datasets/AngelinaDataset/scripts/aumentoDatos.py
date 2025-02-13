@@ -35,13 +35,13 @@ braille_map = {
     'z': [1, 4, 5, 6]
 }
 
-# Function to perform data augmentation
+# Función para realizar aumento de datos
 def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
     img = load_img(ruta_imagen)
     x = img_to_array(img)
     x = np.expand_dims(x, axis=0)
 
-    # Data augmentation parameters
+    # Parámetros de aumento de datos
     datagen = ImageDataGenerator(
         width_shift_range=0.2,
         height_shift_range=0.2,
@@ -50,16 +50,16 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
         zoom_range=[0.8, 1.2]
     )
 
-    # Generate augmented images
+    # Generar imágenes aumentadas
     i = 0
-    augmented_filenames = []
+    nombres_archivos_aumentados = []
     for batch in datagen.flow(x, batch_size=1, save_to_dir=carpeta_salida, save_prefix=f'{os.path.splitext(archivo)[0]}_aug', save_format='jpg'):
         i += 1
-        augmented_filename = f'{os.path.splitext(archivo)[0]}_aug_{i}.jpg'
-        augmented_filenames.append(augmented_filename)
-        if i >= 5:  # Generate 5 augmented images per input image
+        nombre_archivo_aumentado = f'{os.path.splitext(archivo)[0]}_aug_{i}.jpg'
+        nombres_archivos_aumentados.append(nombre_archivo_aumentado)
+        if i >= 5:  # Generar 5 imágenes aumentadas por imagen de entrada
             break
-    return augmented_filenames
+    return nombres_archivos_aumentados
 
 def procesar_dataset(carpeta_entrada, carpeta_salida, carpeta_anotaciones_entrada, carpeta_anotaciones_salida):
     if not os.path.exists(carpeta_salida):
@@ -68,15 +68,15 @@ def procesar_dataset(carpeta_entrada, carpeta_salida, carpeta_anotaciones_entrad
     if not os.path.exists(carpeta_anotaciones_salida):
         os.makedirs(carpeta_anotaciones_salida)
     
-    augmented_files_map = {}
+    mapa_archivos_aumentados = {}
     for archivo in os.listdir(carpeta_entrada):
         if archivo.endswith(".jpg") or archivo.endswith(".png"):
             ruta_entrada = os.path.join(carpeta_entrada, archivo)
-            augmented_filenames = procesar_imagen(ruta_entrada, carpeta_salida, archivo)
-            augmented_files_map[archivo] = augmented_filenames
+            nombres_archivos_aumentados = procesar_imagen(ruta_entrada, carpeta_salida, archivo)
+            mapa_archivos_aumentados[archivo] = nombres_archivos_aumentados
             print(f"Procesado: {archivo}")
     
-    # Copy and update annotations
+    # Copiar y actualizar anotaciones
     for archivo_csv in os.listdir(carpeta_anotaciones_entrada):
         if archivo_csv.endswith(".csv"):
             ruta_csv_entrada = os.path.join(carpeta_anotaciones_entrada, archivo_csv)
@@ -89,18 +89,18 @@ def procesar_dataset(carpeta_entrada, carpeta_salida, carpeta_anotaciones_entrad
                 writer = csv.writer(csv_out)
                 
                 for row in reader:
-                    original_filename = os.path.basename(row[0])
-                    if original_filename in augmented_files_map:
-                        for augmented_filename in augmented_files_map[original_filename]:
-                            new_row = row.copy()
-                            new_row[0] = os.path.join(carpeta_salida, augmented_filename)
-                            writer.writerow(new_row)
+                    nombre_archivo_original = os.path.basename(row[0])
+                    if nombre_archivo_original in mapa_archivos_aumentados:
+                        for nombre_archivo_aumentado in mapa_archivos_aumentados[nombre_archivo_original]:
+                            nueva_fila = row.copy()
+                            nueva_fila[0] = os.path.join(carpeta_salida, nombre_archivo_aumentado)
+                            writer.writerow(nueva_fila)
                     else:
                         writer.writerow(row)
     
     print("Procesamiento completado.")
 
-# List of root paths
+# Lista de rutas raíz
 root_paths = [
     "datasets/AngelinaDataset/books/chudo_derevo_redmi",
     "datasets/AngelinaDataset/books/mdd_cannon1",
@@ -114,7 +114,7 @@ root_paths = [
     "datasets/AngelinaDataset/handwritten/uploaded"
 ]
 
-# Execute the function for each root path
+# Ejecutar la función para cada ruta raíz
 for root in root_paths:
     carpeta_de_entrada = root + "/traducido/filtros"
     carpeta_de_salida = root + "/traducido/aumentoDatos"

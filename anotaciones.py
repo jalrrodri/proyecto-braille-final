@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 
-# List of directories containing CSV files
+# Lista de directorios que contienen archivos CSV
 csv_directories = [
     'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/aumentoDatos/anotaciones',
     'datasets/AngelinaDataset/books/mdd_cannon1/traducido/aumentoDatos/anotaciones',
@@ -14,45 +14,45 @@ csv_directories = [
     'datasets/AngelinaDataset/handwritten/ang_redmi/traducido/aumentoDatos/anotaciones',
     'datasets/AngelinaDataset/handwritten/kov/traducido/aumentoDatos/anotaciones',
     'datasets/AngelinaDataset/handwritten/uploaded/traducido/aumentoDatos/anotaciones'
-    # Add more directories as needed
+    # Agrega más directorios según sea necesario
 ]
 
-# List of individual CSV file paths
+# Lista de rutas de archivos CSV individuales
 csv_files = [
     'datasets/libroINCI/datasetprueba1FILTROS/anotaciones/datasetprueba1FILTROS.csv',
     'datasets/kaggle/anotaciones/kaggle.csv'
-    # Add more individual files as needed
+    # Agrega más archivos individuales según sea necesario
 ]
 
-# Add all CSV files from the directories to the csv_files list
+# Agregar todos los archivos CSV de los directorios a la lista csv_files
 for directory in csv_directories:
     for file in os.listdir(directory):
         if file.endswith('.csv'):
             csv_files.append(os.path.join(directory, file))
 
-# Create an empty list to hold the dataframes
+# Crear una lista vacía para contener los dataframes
 dataframes = []
 
-# Read each CSV file and append the dataframe to the list
+# Leer cada archivo CSV y agregar el dataframe a la lista
 for file in csv_files:
     df = pd.read_csv(file, header=None)
     dataframes.append(df)
 
-# Concatenate all dataframes into one
+# Concatenar todos los dataframes en uno solo
 combined_df = pd.concat(dataframes, ignore_index=True)
 
-# Create a new column with random assignment of 'training', 'test', 'validation'
-np.random.seed(42)  # For reproducibility
+# Crear una nueva columna con asignación aleatoria de 'TRAIN', 'VAL', 'TEST'
+np.random.seed(42)  # Para reproducibilidad
 labels = np.random.choice(['TRAIN', 'VAL', 'TEST'], size=len(combined_df), p=[0.8, 0.1, 0.1])
 combined_df.insert(0, 'set', labels)
 
-# Get the directory of the current script
+# Obtener el directorio del script actual
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Define the output file path
+# Definir la ruta del archivo de salida
 output_file = os.path.join(script_dir, 'anotaciones.csv')
 
-# Save the combined dataframe to a CSV file
+# Guardar el dataframe combinado en un archivo CSV
 combined_df.to_csv(output_file, index=False, header=False)
 
-print(f'Combined CSV saved to {output_file}')
+print(f'Archivo CSV combinado guardado en {output_file}')

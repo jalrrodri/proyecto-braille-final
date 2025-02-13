@@ -12,6 +12,11 @@ def igualar_etiquetas_anotaciones(input_csv_path, output_csv_path):
     for row in rows:
         value_counts[row[2]] += 1
     
+    # Imprimir la cantidad de filas de cada valor en la tercera columna antes del filtro
+    print("Cantidad de cada valor antes del filtro:")
+    for value in sorted(value_counts):
+        print(f"Valor: {value}, Cantidad: {value_counts[value]}")
+    
     # Determinar el valor mínimo entre las cantidades de cada valor
     min_count = min(value_counts.values())
     
@@ -27,6 +32,11 @@ def igualar_etiquetas_anotaciones(input_csv_path, output_csv_path):
     with open(output_csv_path, mode='w', newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerows(filtered_rows)
+    
+    # Imprimir la cantidad de filas de cada valor en la tercera columna después del filtro
+    print("Cantidad de cada valor después del filtro:")
+    for value in sorted(value_counts_filtered):
+        print(f"Valor: {value}, Cantidad: {value_counts_filtered[value]}")
     
     print(f"Archivo CSV procesado y guardado en: {output_csv_path}")
 
