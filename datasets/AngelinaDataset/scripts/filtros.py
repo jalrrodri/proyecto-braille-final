@@ -87,7 +87,12 @@ def procesar_imagen(ruta_imagen, letra):
     
     return img_procesada
 
-def procesar_dataset(carpeta_entrada, carpeta_salida, carpeta_anotaciones_entrada, carpeta_anotaciones_salida):
+def procesar_dataset(root):
+    carpeta_entrada = root + "/traducido/separado"
+    carpeta_salida = root + "/traducido/filtros"
+    carpeta_anotaciones_entrada = root + "/traducido/separado/anotaciones"
+    carpeta_anotaciones_salida = root + "/traducido/filtros/anotaciones"
+
     if not os.path.exists(carpeta_salida):
         os.makedirs(carpeta_salida)
     
@@ -124,12 +129,22 @@ def procesar_dataset(carpeta_entrada, carpeta_salida, carpeta_anotaciones_entrad
                     row[0] = row[0].replace(carpeta_entrada, carpeta_salida)
                     writer.writerow(row)
     
-    print("Procesamiento completado.")
+    print(f"Procesamiento completado para {root}.")
 
-root = 'datasets/AngelinaDataset/books/chudo_derevo_redmi'
-carpeta_de_entrada = root + "/traducido/separado"
-carpeta_de_salida = root + "/traducido/filtros"
-carpeta_anotaciones_entrada = root + "/traducido/separado/anotaciones"
-carpeta_anotaciones_salida = root + "/traducido/filtros/anotaciones"
+# List of root paths
+root_paths = [
+    "datasets/AngelinaDataset/books/chudo_derevo_redmi",
+    "datasets/AngelinaDataset/books/mdd_cannon1",
+    "datasets/AngelinaDataset/books/mdd-redmi1",
+    "datasets/AngelinaDataset/books/ola",
+    "datasets/AngelinaDataset/books/skazki",
+    "datasets/AngelinaDataset/books/telefon",
+    "datasets/AngelinaDataset/books/uploaded",
+    "datasets/AngelinaDataset/handwritten/ang_redmi",
+    "datasets/AngelinaDataset/handwritten/kov",
+    "datasets/AngelinaDataset/handwritten/uploaded"
+]
 
-procesar_dataset(carpeta_de_entrada, carpeta_de_salida, carpeta_anotaciones_entrada, carpeta_anotaciones_salida)
+# Execute the function for each root path
+for root in root_paths:
+    procesar_dataset(root)

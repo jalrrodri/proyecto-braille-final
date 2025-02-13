@@ -1,6 +1,5 @@
 import csv
 import os
-import random
 import re
 
 def convert_number_to_letter(number):
@@ -141,8 +140,21 @@ def generate_csv(folder_path, output_folder):
 
             print(f"CSV file generated successfully: {output_filename}")
 
-# Replace these with your actual folder path and desired output folder
-folder_path = "datasets/AngelinaDataset/books/chudo_derevo_redmi"
-output_folder = folder_path + "/traducido"
+# List of folder paths
+folder_paths = [
+    "datasets/AngelinaDataset/books/chudo_derevo_redmi",
+    "datasets/AngelinaDataset/books/mdd_cannon1",
+    "datasets/AngelinaDataset/books/mdd-redmi1",
+    "datasets/AngelinaDataset/books/ola",
+    "datasets/AngelinaDataset/books/skazki",
+    "datasets/AngelinaDataset/books/telefon",
+    "datasets/AngelinaDataset/books/uploaded",
+    "datasets/AngelinaDataset/handwritten/ang_redmi",
+    "datasets/AngelinaDataset/handwritten/kov",
+    "datasets/AngelinaDataset/handwritten/uploaded"
+]
 
-generate_csv(folder_path, output_folder)
+# Execute generate_csv for each folder path
+for folder_path in folder_paths:
+    output_folder = folder_path + "/traducido"
+    generate_csv(folder_path, output_folder)
