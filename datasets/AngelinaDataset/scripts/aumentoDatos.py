@@ -27,7 +27,7 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
         i += 1
         nombre_archivo_aumentado = f'{os.path.splitext(archivo)[0]}_aug_{i}.jpg'
         nombres_archivos_aumentados.append(nombre_archivo_aumentado)
-        if i >= 7:  # Generar 5 imágenes aumentadas por imagen de entrada
+        if i >= 7:  # Generar i imágenes aumentadas por imagen de entrada
             break
     return nombres_archivos_aumentados
 
