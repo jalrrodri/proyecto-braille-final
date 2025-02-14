@@ -2,18 +2,20 @@ import pandas as pd
 import os
 import numpy as np
 
+# /filtros/anotaciones
+# /filtros/anotaciones
 # Lista de directorios que contienen archivos CSV
 csv_directories = [
-    'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/books/mdd_cannon1/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/books/mdd-redmi1/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/books/ola/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/books/skazki/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/books/telefon/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/books/uploaded/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/handwritten/ang_redmi/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/handwritten/kov/traducido/aumentoDatos/anotaciones',
-    'datasets/AngelinaDataset/handwritten/uploaded/traducido/aumentoDatos/anotaciones'
+    'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/mdd_cannon1/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/mdd-redmi1/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/ola/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/skazki/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/telefon/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/books/uploaded/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/handwritten/ang_redmi/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/handwritten/kov/traducido/filtros/anotaciones',
+    'datasets/AngelinaDataset/handwritten/uploaded/traducido/filtros/anotaciones'
     # Agrega más directorios según sea necesario
 ]
 
