@@ -1,5 +1,6 @@
 import csv
 from collections import defaultdict
+import random
 
 def igualar_etiquetas_anotaciones(input_csv_path, output_csv_path):
     # Leer el archivo CSV y contar la cantidad de cada valor en la tercera columna
@@ -28,10 +29,29 @@ def igualar_etiquetas_anotaciones(input_csv_path, output_csv_path):
             filtered_rows.append(row)
             value_counts_filtered[row[2]] += 1
     
-    # Escribir las filas filtradas en el archivo CSV de salida
+    # Mezclar las filas filtradas de manera aleatoria
+    random.shuffle(filtered_rows)
+    
+    # Dividir las filas filtradas en conjuntos de entrenamiento, validación y prueba
+    train_split = int(0.8 * len(filtered_rows))
+    val_split = int(0.9 * len(filtered_rows))
+    
+    train_rows = filtered_rows[:train_split]
+    val_rows = filtered_rows[train_split:val_split]
+    test_rows = filtered_rows[val_split:]
+    
+    # Agregar la columna de conjunto (TRAIN, VAL, TEST)
+    for row in train_rows:
+        row.append('TRAIN')
+    for row in val_rows:
+        row.append('VAL')
+    for row in test_rows:
+        row.append('TEST')
+    
+    # Escribir las filas filtradas y divididas en el archivo CSV de salida
     with open(output_csv_path, mode='w', newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerows(filtered_rows)
+        writer.writerows(train_rows + val_rows + test_rows)
     
     # Imprimir la cantidad de filas de cada valor en la tercera columna después del filtro
     print("Cantidad de cada valor después del filtro:")
