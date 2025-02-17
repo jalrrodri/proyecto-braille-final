@@ -2,8 +2,6 @@ import pandas as pd
 import os
 import numpy as np
 
-# /filtros/anotaciones
-# /filtros/anotaciones
 # Lista de directorios que contienen archivos CSV
 csv_directories = [
     'datasets/AngelinaDataset/books/chudo_derevo_redmi/traducido/aumentoDatos/anotaciones',
@@ -38,15 +36,12 @@ dataframes = []
 # Leer cada archivo CSV y agregar el dataframe a la lista
 for file in csv_files:
     df = pd.read_csv(file, header=None)
+    # Convertir los valores de la segunda columna a mayúsculas
+    df[1] = df[1].str.upper()
     dataframes.append(df)
 
 # Concatenar todos los dataframes en uno solo
 combined_df = pd.concat(dataframes, ignore_index=True)
-
-# Crear una nueva columna con asignación aleatoria de 'TRAIN', 'VAL', 'TEST'
-np.random.seed(42)  # Para reproducibilidad
-labels = np.random.choice(['TRAIN', 'VAL', 'TEST'], size=len(combined_df), p=[0.8, 0.1, 0.1])
-combined_df.insert(0, 'set', labels)
 
 # Obtener el directorio del script actual
 script_dir = os.path.dirname(os.path.abspath(__file__))
