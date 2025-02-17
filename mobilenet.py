@@ -34,8 +34,8 @@ except Exception as e:
 model = object_detector.create(
     train_data, 
     model_spec=spec, 
-    epochs=1,  # Aumentar epochs para mejor rendimiento
-    batch_size=8, 
+    epochs=50,  # Aumentar epochs para mejor rendimiento
+    batch_size=16, 
     train_whole_model=True, 
     validation_data=validation_data
 )
