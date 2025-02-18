@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from mobilenet import model, test_data
+from entrenamiento import model, test_data
 
 # Visualizar precisión y pérdida durante el entrenamiento
 plt.figure(figsize=(10, 5))
@@ -29,4 +29,4 @@ plt.show()
 model.evaluate(test_data)
 
 # Evaluar el modelo TFLite
-model.evaluate_tflite("modeloGuardado/optimizado/mobilenet/model.tflite", test_data)
+model.evaluate_tflite("modeloGuardado/optimizado/efficientdet_lite0/model.tflite", test_data)
