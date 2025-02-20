@@ -21,7 +21,7 @@ from absl import logging
 logging.set_verbosity(logging.ERROR)
 
 # Especificación del modelo
-spec = model_spec.get('efficientdet_lite4')
+spec = model_spec.get('efficientdet_lite0')
 
 # Cargar datos desde CSV
 try:
