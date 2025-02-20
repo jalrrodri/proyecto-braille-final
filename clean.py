@@ -1,23 +1,39 @@
 import os
 import shutil
+import stat
 
-def eliminar_contenido_aumentoDatos(root_dir):
+def eliminar_contenido_traducido(root_dir):
+    # Recorrer el sistema de archivos desde la raíz especificada
     for dirpath, dirnames, filenames in os.walk(root_dir):
-        for dirname in dirnames:
-            if dirname == 'aumentoDatos':
-                carpeta_aumentoDatos = os.path.join(dirpath, dirname)
-                print(f"Eliminando contenido de: {carpeta_aumentoDatos}")
-                for filename in os.listdir(carpeta_aumentoDatos):
-                    file_path = os.path.join(carpeta_aumentoDatos, filename)
-                    try:
-                        if os.path.isfile(file_path) or os.path.islink(file_path):
-                            os.unlink(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print(f"Error al eliminar {file_path}: {e}")
+        # Verificar si la carpeta actual se llama 'traducido', 'datasetprueba1FILTROS' o 'datasetprueba1AUMENTADO'
+        if os.path.basename(dirpath) in ['traducido', 'datasetprueba1FILTROS', 'datasetprueba1AUMENTADO']:
+            print(f"Eliminando contenido de la carpeta: {dirpath}")
+            # Eliminar todos los archivos en la carpeta
+            for filename in filenames:
+                file_path = os.path.join(dirpath, filename)
+                try:
+                    # Quitar el atributo de solo lectura si está presente
+                    os.chmod(file_path, stat.S_IWRITE)
+                    os.remove(file_path)
+                    print(f"Archivo eliminado: {file_path}")
+                except PermissionError:
+                    print(f"Permiso denegado al eliminar el archivo {file_path}")
+                except Exception as e:
+                    print(f"Error al eliminar el archivo {file_path}: {e}")
+            # Eliminar todas las subcarpetas en la carpeta
+            for dirname in dirnames:
+                dir_to_remove = os.path.join(dirpath, dirname)
+                try:
+                    # Quitar el atributo de solo lectura si está presente
+                    os.chmod(dir_to_remove, stat.S_IWRITE)
+                    shutil.rmtree(dir_to_remove)
+                    print(f"Carpeta eliminada: {dir_to_remove}")
+                except PermissionError:
+                    print(f"Permiso denegado al eliminar la carpeta {dir_to_remove}")
+                except Exception as e:
+                    print(f"Error al eliminar la carpeta {dir_to_remove}: {e}")
 
-# Ruta raíz desde donde se iniciará la búsqueda
-root_dir = '/home/ingsistemas/proyectobraille/ProyectoDeGrado/proyecto-braille-final'
+# Especificar la raíz desde donde se comenzará a buscar
+root_dir = 'd:/ProyectoDeGrado/proyecto-braille-final'
 
-eliminar_contenido_aumentoDatos(root_dir)
+eliminar_contenido_traducido(root_dir)
