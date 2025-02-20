@@ -95,28 +95,25 @@ tflite_evaluation_results = dict(sorted(tflite_evaluation_results.items()))
 ruta_graficos = Path('graficos')
 ruta_graficos.mkdir(parents=True, exist_ok=True)
 
-# Graficar métricas de evaluación del modelo
+# Crear figura y ejes para las gráficas
 fig, axs = plt.subplots(2, 1, figsize=(20, 15))
 
 # Graficar métricas de evaluación del modelo
-axs[0].bar(evaluation_results.keys(), evaluation_results.values(), color='blue')
+axs[0].bar(evaluation_results.keys(), evaluation_results.values(), color='blue', label="Modelo")
 axs[0].set_ylabel('Valor')
 axs[0].set_title('Métricas de Evaluación del Modelo')
 axs[0].tick_params(axis='x', rotation=90)
-axs[0].legend(['Modelo'])
 
 # Graficar métricas de evaluación del modelo TFLite
-axs[1].bar(tflite_evaluation_results.keys(), tflite_evaluation_results.values(), color='green')
+axs[1].bar(tflite_evaluation_results.keys(), tflite_evaluation_results.values(), color='green', label="Modelo TFLite")
 axs[1].set_ylabel('Valor')
 axs[1].set_title('Métricas de Evaluación del Modelo TFLite')
 axs[1].tick_params(axis='x', rotation=90)
-axs[1].legend(['Modelo TFLite'])
 
-# Añadir la leyenda al lado del gráfico
-fig.subplots_adjust(right=0.55)
+# Añadir leyenda como un cuadro flotante a la derecha
 legend_text = "\n".join([f"{clave}: {significado}" for clave, significado in leyenda.items()])
-plt.gcf().text(0.58, 0.5, legend_text, fontsize=12, va='center')
+fig.legend([legend_text], loc='center left', bbox_to_anchor=(1, 0.5), fontsize=12, frameon=True)
 
 plt.tight_layout()
-plt.savefig(ruta_graficos / 'test_resultados_evaluacion.png')
+plt.savefig(ruta_graficos / 'test_resultados_evaluacion.png', bbox_inches='tight')
 plt.close()
