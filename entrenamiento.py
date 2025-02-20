@@ -116,5 +116,5 @@ legend_text = "\n".join([f"{clave}: {significado}" for clave, significado in ley
 fig.legend([legend_text], loc='center left', bbox_to_anchor=(1, 0.5), fontsize=12, frameon=True)
 
 plt.tight_layout()
-plt.savefig(ruta_graficos / 'test_resultados_evaluacion.png', bbox_inches='tight')
+plt.savefig(ruta_graficos / 'resultados_evaluacion.png', bbox_inches='tight')
 plt.close()
