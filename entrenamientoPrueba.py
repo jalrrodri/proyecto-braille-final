@@ -118,5 +118,5 @@ legend_text = "\n".join([f"{clave}: {significado}" for clave, significado in ley
 plt.gcf().text(0.58, 0.5, legend_text, fontsize=12, va='center')
 
 plt.tight_layout()
-plt.savefig(ruta_graficos / 'resultados_evaluacion.png')
+plt.savefig(ruta_graficos / 'test_resultados_evaluacion.png')
 plt.close()
