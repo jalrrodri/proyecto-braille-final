@@ -35,7 +35,7 @@ model = object_detector.create(
     train_data, 
     model_spec=spec, 
     epochs=50,  # Aumentar epochs para mejor rendimiento
-    batch_size=8, 
+    batch_size=16, 
     train_whole_model=True, 
     validation_data=validation_data,
     do_train=True

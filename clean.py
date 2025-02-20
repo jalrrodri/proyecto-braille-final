@@ -34,6 +34,6 @@ def eliminar_contenido_traducido(root_dir):
                     print(f"Error al eliminar la carpeta {dir_to_remove}: {e}")
 
 # Especificar la raíz desde donde se comenzará a buscar
-root_dir = 'd:/ProyectoDeGrado/proyecto-braille-final'
+root_dir = '/home/ingsistemas/proyectobraille/ProyectoDeGrado/proyecto-braille-final'
 
 eliminar_contenido_traducido(root_dir)
