@@ -25,7 +25,7 @@ spec = model_spec.get('efficientdet_lite0')
 
 # Cargar datos desde CSV
 try:
-    train_data, validation_data, test_data = object_detector.DataLoader.from_csv('anotacionesIgualadas.csv')
+    train_data, validation_data, test_data = object_detector.DataLoader.from_csv('anotacionesIgualadasPrueba.csv')
 except Exception as e:
     print(f"Error al cargar datos CSV: {e}")
     exit(1)
