@@ -32,7 +32,7 @@ except Exception as e:
 
 # Crear y entrenar el modelo
 model = object_detector.create(
-    train_data, 
+    train_data=train_data, 
     model_spec=spec, 
     epochs=50,  # Aumentar epochs para mejor rendimiento
     batch_size=16, 
