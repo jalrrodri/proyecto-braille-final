@@ -20,11 +20,19 @@ tf.get_logger().setLevel('ERROR')
 from absl import logging
 logging.set_verbosity(logging.ERROR)
 
+# OBJECT_DETECTION_MODELS = [
+#     'efficientdet_lite0',
+#     'efficientdet_lite1',
+#     'efficientdet_lite2',
+#     'efficientdet_lite3',
+#     'efficientdet_lite4',
+# ]
+
 # Nombre modelo
 nombre_modelo = 'efficientdet_lite0'
 
 # Especificación del modelo
-spec = model_spec.get(nombre_modelo)
+spec = model_spec.get('efficientdet_lite0')
 
 # Cargar datos desde CSV
 try:
