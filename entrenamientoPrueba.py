@@ -20,8 +20,11 @@ tf.get_logger().setLevel('ERROR')
 from absl import logging
 logging.set_verbosity(logging.ERROR)
 
+# Nombre modelo
+nombre_modelo = 'efficientdet_lite0'
+
 # Especificación del modelo
-spec = model_spec.get('efficientdet_lite0')
+spec = model_spec.get(nombre_modelo)
 
 # Cargar datos desde CSV
 try:
@@ -109,6 +112,9 @@ axs[1].bar(tflite_evaluation_results.keys(), tflite_evaluation_results.values(),
 axs[1].set_ylabel('Valor')
 axs[1].set_title('Métricas de Evaluación del Modelo TFLite')
 axs[1].tick_params(axis='x', rotation=90)
+
+# Añadir título principal al gráfico
+fig.suptitle(nombre_modelo, fontsize=16)
 
 # Añadir leyenda como un cuadro flotante a la derecha
 legend_text = "\n".join([f"{clave}: {significado}" for clave, significado in leyenda.items()])
