@@ -8,3 +8,4 @@ https://cloud.google.com/vertex-ai/docs/beginner/beginners-guide?hl=es-419#image
 https://ai.google.dev/edge/litert/libraries/modify/object_detection#load_the_dataset
 https://stackoverflow.com/questions/69824735/tensorflow-lite-object-detection-csv
 https://colab.research.google.com/drive/19hKLXzvPax12XGfmSedzBBStplGOwn2q?usp=sharing
+https://developers.googleblog.com/en/tensorflow-lite-is-now-litert/
