@@ -24,7 +24,7 @@ logging.set_verbosity(logging.ERROR)
 nombre_modelo = 'efficientdet_lite0'
 
 # Especificación del modelo
-spec = model_spec.get('efficientdet_lite0')
+spec = model_spec.get(nombre_modelo)
 
 # Cargar datos desde CSV
 try:
