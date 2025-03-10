@@ -7,6 +7,8 @@ import random
 from absl import logging
 import os
 import time
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # Establecer semillas aleatorias para reproducibilidad
 tf.random.set_seed(42)
