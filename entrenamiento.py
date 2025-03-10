@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 import random
+from absl import logging
 
 # Establecer semillas aleatorias para reproducibilidad
 tf.random.set_seed(42)
@@ -17,7 +18,6 @@ ruta_modelo.mkdir(parents=True, exist_ok=True)
 # Verificar versión de TensorFlow
 assert tf.__version__.startswith('2')
 tf.get_logger().setLevel('ERROR')
-from absl import logging
 logging.set_verbosity(logging.ERROR)
 
 # OBJECT_DETECTION_MODELS = [
