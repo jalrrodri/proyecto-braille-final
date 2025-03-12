@@ -26,7 +26,7 @@ OBJECT_DETECTION_MODELS = [
     'efficientdet_lite1',
     'efficientdet_lite2',
     'efficientdet_lite3',
-    'efficientdet_lite4',
+    'efficientdet_lite4'
 ]
 
 # Configuración de rutas base
@@ -88,7 +88,7 @@ for nombre_modelo in OBJECT_DETECTION_MODELS:
             train_data=train_data, 
             model_spec=spec, 
             epochs=50,  # Aumentar epochs para mejor rendimiento
-            batch_size=16, 
+            batch_size=8, 
             train_whole_model=True, 
             validation_data=validation_data,
             do_train=True
