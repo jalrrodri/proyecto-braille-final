@@ -12,11 +12,7 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
 
     # Parámetros de aumento de datos
     datagen = ImageDataGenerator(
-        width_shift_range=0.1,
-        height_shift_range=0.1,
-        rotation_range=5,
-        brightness_range=[0.8, 1.2],
-        zoom_range=[0.8, 1.2]
+        preprocessing_function=apply_augmentations
     )
 
     # Generar imágenes aumentadas y guardarlas en la carpeta de salida
@@ -29,6 +25,32 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
         if i >= 7:  # Generar i imágenes aumentadas por imagen de entrada
             break
     return nombres_archivos_aumentados
+
+def apply_augmentations(image):
+    # Convertir a escala de grises
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
+    # Aplicar desenfoque
+    blur_amount = np.random.uniform(0, 4.6)
+    image = cv2.GaussianBlur(image, (5, 5), blur_amount)
+
+    # Añadir ruido
+    noise_amount = np.random.uniform(0, 0.0199)
+    noise = np.random.normal(0, noise_amount, image.shape)
+    image = np.clip(image + noise, 0, 255).astype(np.uint8)
+
+    # Ajustar tono
+    hue_shift = np.random.uniform(-14, 14)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    image[:, :, 0] = (image[:, :, 0] + hue_shift) % 180
+    image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
+
+    # Ajustar exposición
+    exposure_shift = np.random.uniform(-0.18, 0.18)
+    image = np.clip(image * (1 + exposure_shift), 0, 255).astype(np.uint8)
+
+    return image
 
 def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
     # Crear la carpeta de anotaciones si no existe
