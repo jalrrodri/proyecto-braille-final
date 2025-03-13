@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import csv
 
 # Mapeo de letras Braille a cuadrantes en relieve
 braille_map = {
@@ -85,7 +86,7 @@ def procesar_imagen(ruta_imagen, letra):
     
     return img_procesada
 
-def procesar_dataset(carpeta_entrada, carpeta_salida):
+def procesar_dataset(carpeta_entrada, carpeta_salida, archivo_csv_salida):
     if not os.path.exists(carpeta_salida):
         os.makedirs(carpeta_salida)
     
@@ -98,8 +99,27 @@ def procesar_dataset(carpeta_entrada, carpeta_salida):
                 ruta_salida = os.path.join(carpeta_salida, archivo)
                 cv2.imwrite(ruta_salida, imagen_procesada)
                 print(f"Procesado: {archivo}")
-    print("Procesamiento completado.")
+    
+    # Generar archivo CSV con anotaciones
+    generar_anotaciones_csv(carpeta_salida, archivo_csv_salida)
+    print(f"Archivo CSV de anotaciones generado: {archivo_csv_salida}")
+
+def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
+    # Crear la carpeta de anotaciones si no existe
+    carpeta_anotaciones = os.path.dirname(archivo_csv_salida)
+    if not os.path.exists(carpeta_anotaciones):
+        os.makedirs(carpeta_anotaciones)
+
+    with open(archivo_csv_salida, mode='w', newline='', encoding='utf-8') as csv_out:
+        writer = csv.writer(csv_out)
+        for archivo in os.listdir(carpeta_salida):
+            if archivo.endswith(".jpg") or archivo.endswith(".png"):
+                ruta_imagen = os.path.join(carpeta_salida, archivo)
+                etiqueta = os.path.basename(archivo)[0]  # Obtener la primera letra del nombre del archivo
+                fila = [ruta_imagen, etiqueta, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]
+                writer.writerow(fila)
 
 carpeta_de_entrada = "datasets/libroINCI/datasetprueba1"
 carpeta_de_salida = "datasets/libroINCI/datasetprueba1FILTROS"
-procesar_dataset(carpeta_de_entrada, carpeta_de_salida)
+archivo_csv_salida = "datasets/libroINCI/datasetprueba1FILTROS/anotaciones/datasetprueba1FILTROS.csv"
+procesar_dataset(carpeta_de_entrada, carpeta_de_salida, archivo_csv_salida)
