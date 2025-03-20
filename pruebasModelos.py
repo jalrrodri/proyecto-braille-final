@@ -1,305 +1,260 @@
-import os
-import random
 import matplotlib.pyplot as plt
-import numpy as np
 import tensorflow as tf
-from tflite_model_maker import object_detector
-from tflite_model_maker.object_detector import DataLoader
-from tflite_support import metadata
-from tflite_support.metadata import metadata_schema_py_generated as metadata_fb
-from tensorflow.lite.python.interpreter import Interpreter
-from PIL import Image, ImageDraw, ImageFont
-import cv2
+import numpy as np
 from pathlib import Path
-import json
-
-# Set random seeds for reproducibility
-tf.random.set_seed(42)
-np.random.seed(42)
-random.seed(42)
+import cv2
+import pandas as pd
+import os
+from tflite_support.task import vision
+from tflite_support.task import core
+from tflite_support.task import processor
 
 # Configuration
 MODEL_NAMES = [
-    "efficientdet_lite0",
-    "efficientdet_lite1",
-    "efficientdet_lite2",
-    "efficientdet_lite3"
+    'efficientdet_lite0',
+    'efficientdet_lite1',
+    'efficientdet_lite2',
+    'efficientdet_lite3'
 ]
+MODEL_BASE_PATH = Path('modelosGuardados')
+IMAGE_PATH = Path('imagenesPrueba')  # Directory with test images
+OUTPUT_PATH = Path('graficosPruebas')
+OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
 
-# Colors for visualization (one for each letter A-Z)
-COLORS = {}
-for i, letter in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
-    COLORS[letter] = tuple(np.random.randint(0, 255, 3).tolist())
+# Load ground truth labels (assuming you have a CSV with image names and real labels)
+# Modify this according to your data format
+def load_ground_truth(csv_path):
+    try:
+        df = pd.read_csv(csv_path)
+        # Assuming your CSV has 'image_name' and 'label' columns
+        return {row['image_name']: row['label'] for _, row in df.iterrows()}
+    except Exception as e:
+        print(f"Error loading ground truth: {e}")
+        # If CSV not available, we'll just use filenames for testing
+        image_files = list(IMAGE_PATH.glob('*.jpg')) + list(IMAGE_PATH.glob('*.png'))
+        # Assuming filenames start with the true label, e.g., "A_123.jpg"
+        return {img.name: img.name.split('_')[0] for img in image_files}
 
+# Load TFLite models
+def load_model(model_name):
+    model_path = Path(MODEL_BASE_PATH).joinpath(model_name, "optimizado", "main", "model.tflite")
+    if not model_path.exists():
+        print(f"Model not found at {model_path}")
+        return None
+    
+    # Create TFLite task detector
+    base_options = core.BaseOptions(file_name=str(model_path))
+    detection_options = processor.DetectionOptions(max_results=5, score_threshold=0.3)
+    options = vision.ObjectDetectorOptions(base_options=base_options, detection_options=detection_options)
+    
+    try:
+        detector = vision.ObjectDetector.create_from_options(options)
+        return detector
+    except Exception as e:
+        print(f"Error loading model {model_name}: {e}")
+        return None
 
-def load_models(base_path="modelosGuardados"):
-    """Carga los modelos TFLite y los retorna en tipo diccionario."""
+# Process an image with the model
+def process_image(detector, image_path):
+    # Read the image
+    image = cv2.imread(str(image_path))
+    if image is None:
+        print(f"Failed to read image: {image_path}")
+        return None, []
+    
+    # Convert to RGB
+    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    
+    # Create TensorImage from numpy array
+    input_tensor = vision.TensorImage.create_from_array(rgb_image)
+    
+    # Run inference
+    detection_result = detector.detect(input_tensor)
+    
+    # Get top detection
+    if detection_result.detections:
+        # Sort by score
+        sorted_detections = sorted(detection_result.detections, 
+                                  key=lambda x: x.categories[0].score, 
+                                  reverse=True)
+        
+        top_detection = sorted_detections[0]
+        label = top_detection.categories[0].category_name
+        confidence = top_detection.categories[0].score
+        
+        # Draw bounding box on image
+        bbox = top_detection.bounding_box
+        cv2.rectangle(image, 
+                     (bbox.origin_x, bbox.origin_y), 
+                     (bbox.origin_x + bbox.width, bbox.origin_y + bbox.height), 
+                     (0, 255, 0), 2)
+        
+        # Add label and confidence
+        cv2.putText(image, 
+                   f"{label}: {confidence:.2f}", 
+                   (bbox.origin_x, bbox.origin_y - 10), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        return image, [(label, confidence)]
+    else:
+        return image, []
+
+# Main function
+def main():
+    # Load ground truth
+    ground_truth = load_ground_truth('imagenesPrueba.csv')  # Update with your CSV path
+    
+    # Get test images
+    image_files = list(IMAGE_PATH.glob('*.jpg')) + list(IMAGE_PATH.glob('*.png'))
+    if len(image_files) == 0:
+        print(f"No images found in {IMAGE_PATH}")
+        return
+    
+    # Use the first 27 images or all if fewer
+    test_images = image_files[:27] if len(image_files) > 27 else image_files
+    print(f"Testing with {len(test_images)} images")
+    
+    # Load models
     models = {}
     for model_name in MODEL_NAMES:
-        model_path = Path(base_path) / model_name / "/optimizado/main/model.tflite"
-        if not model_path.exists():
-            print(f"Advertencia: Modelo {model_name} no encontrado en: {model_path}")
-            continue
-
-        print(f"Loading model: {model_name}")
-        interpreter = Interpreter(model_path=str(model_path))
-        interpreter.allocate_tensors()
-
-        # Get model details
-        input_details = interpreter.get_input_details()
-        output_details = interpreter.get_output_details()
-
-        # Get label map from metadata
-        try:
-            displayer = metadata.MetadataDisplayer.with_model_file(str(model_path))
-            metadata_json = displayer.get_metadata_json()
-            metadata_dict = json.loads(metadata_json)
-
-            # Extract label map
-            label_map = {}
-            for i, label in enumerate(metadata_dict["associatedFiles"][0]["labelMap"]):
-                label_map[i] = label
-        except Exception as e:
-            print(f"Error loading metadata for {model_name}: {e}")
-            # Fallback to default A-Z label map
-            label_map = {i: chr(65 + i) for i in range(26)}  # A-Z
-
-        models[model_name] = {
-            "interpreter": interpreter,
-            "input_details": input_details,
-            "output_details": output_details,
-            "label_map": label_map,
-        }
-
-    return models
-
-
-def load_test_images(csv_path="imagenesPrueba.csv", num_samples=26):
-    """Load test images with ground truth annotations."""
-    try:
-        _, _, test_data = object_detector.DataLoader.from_csv(csv_path)
-
-        # Get a subset of test data
-        test_samples = []
-        for i in range(min(num_samples, len(test_data))):
-            test_samples.append(test_data[i])
-
-        return test_samples
-    except Exception as e:
-        print(f"Error loading test data: {e}")
-        return []
-
-
-def preprocess_image(image_path, input_shape):
-    """Preprocess image for model input."""
-    image = tf.io.read_file(image_path)
-    image = tf.image.decode_image(image, channels=3)
-    image = tf.image.convert_image_dtype(image, tf.float32)
-    original_image = image
-    image = tf.image.resize(image, input_shape)
-    return image, original_image
-
-
-def run_inference(model_info, image):
-    """Run inference on a single image."""
-    interpreter = model_info["interpreter"]
-    input_details = model_info["input_details"]
-    output_details = model_info["output_details"]
-
-    # Get input shape
-    input_shape = input_details[0]["shape"][1:3]  # Height, width
-
-    # Preprocess image
-    processed_image, original_image = preprocess_image(image, input_shape)
-
-    # Add batch dimension
-    input_data = np.expand_dims(processed_image, axis=0)
-
-    # Set input tensor
-    interpreter.set_tensor(input_details[0]["index"], input_data)
-
-    # Run inference
-    interpreter.invoke()
-
-    # Get output tensors
-    # For object detection, usually there are 4 output tensors:
-    # - Locations (bounding boxes)
-    # - Classes (class ids)
-    # - Scores (confidence)
-    # - Number of detections
-
-    # Extract detection results
-    boxes = interpreter.get_tensor(output_details[0]["index"])[0]  # Bounding boxes
-    classes = interpreter.get_tensor(output_details[1]["index"])[0]  # Class IDs
-    scores = interpreter.get_tensor(output_details[2]["index"])[0]  # Confidence scores
-    num_detections = int(
-        interpreter.get_tensor(output_details[3]["index"])[0]
-    )  # Number of detections
-
-    return {
-        "boxes": boxes[:num_detections],
-        "classes": classes[:num_detections],
-        "scores": scores[:num_detections],
-        "num_detections": num_detections,
-    }
-
-
-def visualize_predictions(
-    image_path, ground_truth, predictions_by_model, output_dir="comparison_results"
-):
-    """Visualize and save comparison between different models."""
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Load image
-    image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    # Get image dimensions
-    height, width, _ = image.shape
-
-    # Create figure with subplots
-    n_models = len(predictions_by_model) + 1  # +1 for ground truth
-    fig, axs = plt.subplots(1, n_models, figsize=(n_models * 5, 5))
-
-    # Plot ground truth
-    axs[0].imshow(image)
-    axs[0].set_title("Ground Truth")
-
-    # Draw ground truth boxes
-    for annotation in ground_truth:
-        xmin, ymin, xmax, ymax = annotation["bbox"]
-        xmin, ymin, xmax, ymax = (
-            int(xmin * width),
-            int(ymin * height),
-            int(xmax * width),
-            int(ymax * height),
-        )
-        label = annotation["label"]
-        color = COLORS.get(label, (255, 0, 0))
-
-        # Draw rectangle
-        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
-
-        # Add label
-        label_text = f"{label}"
-        cv2.putText(
-            image,
-            label_text,
-            (xmin, ymin - 10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            color,
-            2,
-        )
-
-    axs[0].imshow(image)
-    axs[0].axis("off")
-
-    # Plot predictions for each model
-    for i, (model_name, predictions) in enumerate(predictions_by_model.items(), 1):
-        # Make a copy of the original image
-        pred_image = image.copy()
-
-        # Get model info
-        model_info = models[model_name]
-        label_map = model_info["label_map"]
-
-        # Draw prediction boxes
-        for j in range(predictions["num_detections"]):
-            if predictions["scores"][j] < 0.5:  # Skip low confidence detections
-                continue
-
-            # Get bounding box coordinates
-            ymin, xmin, ymax, xmax = predictions["boxes"][j]
-            xmin, ymin, xmax, ymax = (
-                int(xmin * width),
-                int(ymin * height),
-                int(xmax * width),
-                int(ymax * height),
-            )
-
-            # Get class ID and label
-            class_id = int(predictions["classes"][j])
-            label = label_map.get(class_id, f"Unknown ({class_id})")
-
-            # Get color for this label
-            color = COLORS.get(label, (0, 255, 0))
-
-            # Draw rectangle
-            cv2.rectangle(pred_image, (xmin, ymin), (xmax, ymax), color, 2)
-
-            # Add label with confidence score
-            confidence = predictions["scores"][j]
-            label_text = f"{label}: {confidence:.2f}"
-            cv2.putText(
-                pred_image,
-                label_text,
-                (xmin, ymin - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                color,
-                2,
-            )
-
-        # Show image with predictions
-        axs[i].imshow(pred_image)
-        axs[i].set_title(f"Model: {model_name}")
-        axs[i].axis("off")
-
-    # Save the figure
-    image_name = os.path.basename(image_path)
-    plt.tight_layout()
-    plt.savefig(
-        os.path.join(output_dir, f"comparison_{image_name}"), bbox_inches="tight"
-    )
-    plt.close()
-
-    print(f"Saved comparison for {image_path}")
-
-
-def main():
-    # Load all models
-    global models
-    models = load_models()
-
+        detector = load_model(model_name)
+        if detector:
+            models[model_name] = detector
+    
     if not models:
-        print("No models loaded. Exiting.")
+        print("No models loaded successfully")
         return
-
-    # Load test images
-    test_samples = load_test_images(num_samples=26)
-
-    if not test_samples:
-        print("No test samples loaded. Exiting.")
-        return
-
-    # Create output directory
-    output_dir = "comparison_results"
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Process each test sample
-    for i, sample in enumerate(test_samples):
-        print(f"Processing sample {i + 1}/{len(test_samples)}")
-
-        # Get image path and ground truth
-        image_path = sample["image"]
-        ground_truth = sample["objects"]
-
-        # Run inference with each model
-        predictions_by_model = {}
-        for model_name, model_info in models.items():
-            try:
-                predictions = run_inference(model_info, image_path)
-                predictions_by_model[model_name] = predictions
-            except Exception as e:
-                print(f"Error running inference with {model_name}: {e}")
-
-        # Visualize predictions
-        visualize_predictions(
-            image_path, ground_truth, predictions_by_model, output_dir
-        )
-
+    
+    # Process images with each model
+    results = {model_name: [] for model_name in models}
+    
+    for image_path in test_images:
+        image_name = image_path.name
+        true_label = ground_truth.get(image_name, "Unknown")
+        
+        for model_name, detector in models.items():
+            annotated_image, detections = process_image(detector, image_path)
+            
+            predicted_label = detections[0][0] if detections else "No detection"
+            confidence = detections[0][1] if detections else 0.0
+            
+            results[model_name].append({
+                'image_path': image_path,
+                'image_name': image_name,
+                'true_label': true_label,
+                'predicted_label': predicted_label,
+                'confidence': confidence,
+                'annotated_image': annotated_image
+            })
+    
+    # Create visualization grid
+    num_images = len(test_images)
+    num_models = len(models)
+    
+    # Calculate grid dimensions
+    rows = min(27, num_images)
+    cols = num_models + 1  # +1 for original image
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*4, rows*3))
+    fig.suptitle('Object Detection Results Comparison', fontsize=16)
+    
+    # Set column titles
+    if rows == 1:
+        axes[0].set_title('Original')
+        for i, model_name in enumerate(models.keys()):
+            axes[i+1].set_title(model_name)
+    else:
+        axes[0, 0].set_title('Original')
+        for i, model_name in enumerate(models.keys()):
+            axes[0, i+1].set_title(model_name)
+    
+    # Plot results
+    for row_idx in range(rows):
+        image_path = test_images[row_idx]
+        image = cv2.imread(str(image_path))
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        
+        true_label = ground_truth.get(image_path.name, "Unknown")
+        
+        # Original image
+        if rows == 1:
+            ax = axes[0]
+        else:
+            ax = axes[row_idx, 0]
+        
+        ax.imshow(image)
+        ax.set_ylabel(f"True: {true_label}", fontsize=12)
+        ax.axis('off')
+        
+        # Model results
+        for col_idx, model_name in enumerate(models.keys()):
+            result = results[model_name][row_idx]
+            
+            if rows == 1:
+                ax = axes[col_idx+1]
+            else:
+                ax = axes[row_idx, col_idx+1]
+            
+            ax.imshow(result['annotated_image'])
+            ax.set_title(f"Pred: {result['predicted_label']}\nConf: {result['confidence']:.2f}", fontsize=10)
+            ax.axis('off')
+    
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.95)
+    fig.savefig(OUTPUT_PATH / 'detection_comparison.png', bbox_inches='tight', dpi=150)
+    
+    # Generate summary statistics
+    print("\nSummary Statistics:")
+    for model_name in models:
+        correct = sum(1 for r in results[model_name] if r['predicted_label'] == r['true_label'])
+        accuracy = correct / len(results[model_name])
+        print(f"{model_name}: Accuracy = {accuracy:.2f} ({correct}/{len(results[model_name])})")
+    
+    # Generate confusion matrices
+    for model_name in models:
+        model_results = results[model_name]
+        
+        # Get unique labels (true and predicted)
+        true_labels = set(r['true_label'] for r in model_results)
+        pred_labels = set(r['predicted_label'] for r in model_results)
+        all_labels = sorted(true_labels.union(pred_labels))
+        
+        # Create confusion matrix
+        cm = np.zeros((len(all_labels), len(all_labels)), dtype=int)
+        label_to_idx = {label: i for i, label in enumerate(all_labels)}
+        
+        for r in model_results:
+            true_idx = label_to_idx.get(r['true_label'], -1)
+            pred_idx = label_to_idx.get(r['predicted_label'], -1)
+            if true_idx >= 0 and pred_idx >= 0:
+                cm[true_idx, pred_idx] += 1
+        
+        # Plot confusion matrix
+        plt.figure(figsize=(10, 8))
+        plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+        plt.title(f'Confusion Matrix - {model_name}')
+        plt.colorbar()
+        
+        tick_marks = np.arange(len(all_labels))
+        plt.xticks(tick_marks, all_labels, rotation=45)
+        plt.yticks(tick_marks, all_labels)
+        
+        plt.xlabel('Predicted Label')
+        plt.ylabel('True Label')
+        plt.tight_layout()
+        
+        # Add text annotations
+        thresh = cm.max() / 2
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                plt.text(j, i, format(cm[i, j], 'd'),
+                        ha="center", va="center",
+                        color="white" if cm[i, j] > thresh else "black")
+        
+        plt.savefig(OUTPUT_PATH / f'confusion_matrix_{model_name}.png', bbox_inches='tight')
+        plt.close()
+    
+    print(f"\nResults saved to {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
