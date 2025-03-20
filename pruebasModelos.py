@@ -4,11 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from tflite_model_maker import object_detector
-from tflite_model_maker.object_detector import DataLoader
 from tflite_support import metadata
-from tflite_support.metadata import metadata_schema_py_generated as metadata_fb
 from tensorflow.lite.python.interpreter import Interpreter
-from PIL import Image, ImageDraw, ImageFont
 import cv2
 from pathlib import Path
 import json
