@@ -1,13 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-<<<<<<< HEAD
 import tensorflow as tf
 from tflite_model_maker import object_detector
 from tflite_support import metadata
 from tensorflow.lite.python.interpreter import Interpreter
 import cv2
-=======
->>>>>>> 848383a5b935bfa5ccd767b0d61d2e12d0c8d549
 from pathlib import Path
 import cv2
 import pandas as pd
