@@ -11,9 +11,14 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
     x = img_to_array(img)
     x = np.expand_dims(x, axis=0)
 
-    # Parámetros de aumento de datos
+    # Parámetros de aumento de datos más completos
     datagen = ImageDataGenerator(
-        preprocessing_function=apply_augmentations
+        preprocessing_function=apply_augmentations,
+        rotation_range=3,        # Pequeña rotación (hasta 3 grados)
+        width_shift_range=0.02,  # Desplazamiento horizontal
+        height_shift_range=0.02, # Desplazamiento vertical
+        zoom_range=0.05,         # Zoom aleatorio
+        fill_mode='nearest'      # Método para rellenar píxeles creados por la transformación
     )
 
     # Generar imágenes aumentadas y guardarlas en la carpeta de salida
@@ -23,7 +28,7 @@ def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
         i += 1
         nombre_archivo_aumentado = f'{os.path.splitext(archivo)[0]}_aug_{i}.jpg'
         nombres_archivos_aumentados.append(nombre_archivo_aumentado)
-        if i >= 7:  # Generar i imágenes aumentadas por imagen de entrada
+        if i >= 10:  # Aumentado de 7 a 10 imágenes aumentadas por imagen de entrada
             break
     return nombres_archivos_aumentados
 
@@ -32,14 +37,32 @@ def apply_augmentations(image):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
-    # Aplicar desenfoque
-    blur_amount = np.random.uniform(0, 4.6)
+    # Aplicar desenfoque (ligeramente aumentado)
+    blur_amount = np.random.uniform(0, 5.5)  # Aumentado de 4.6 a 5.5
     image = cv2.GaussianBlur(image, (5, 5), blur_amount)
 
-    # Añadir ruido
-    noise_amount = np.random.uniform(0, 0.0199)
-    noise = np.random.normal(0, noise_amount, image.shape)
+    # Añadir ruido gaussiano (aumentado)
+    noise_amount = np.random.uniform(0.005, 0.035)  # Aumentado de 0-0.0199 a 0.005-0.035
+    noise = np.random.normal(0, noise_amount * 255, image.shape)
     image = np.clip(image + noise, 0, 255).astype(np.uint8)
+    
+    # Añadir ocasionalmente ruido de sal y pimienta
+    if np.random.random() < 0.3:  # 30% de probabilidad
+        s_vs_p = 0.5
+        amount = np.random.uniform(0.001, 0.004)
+        # Sal
+        num_salt = np.ceil(amount * image.size * s_vs_p)
+        coords = [np.random.randint(0, i - 1, int(num_salt)) for i in image.shape]
+        image[coords[0], coords[1], :] = 255
+        # Pimienta
+        num_pepper = np.ceil(amount * image.size * (1. - s_vs_p))
+        coords = [np.random.randint(0, i - 1, int(num_pepper)) for i in image.shape]
+        image[coords[0], coords[1], :] = 0
+    
+    # Añadir ocasionalmente ruido de disparo (shot noise)
+    if np.random.random() < 0.25:  # 25% de probabilidad
+        shot_noise = np.random.poisson(image * 0.1) / 0.1
+        image = np.clip(shot_noise, 0, 255).astype(np.uint8)
 
     # Ajustar tono
     hue_shift = np.random.uniform(-14, 14)
@@ -47,9 +70,15 @@ def apply_augmentations(image):
     image[:, :, 0] = (image[:, :, 0] + hue_shift) % 180
     image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
 
-    # Ajustar exposición
-    exposure_shift = np.random.uniform(-0.18, 0.18)
+    # Ajustar exposición (ligeramente aumentado)
+    exposure_shift = np.random.uniform(-0.22, 0.22)  # Aumentado de ±0.18 a ±0.22
     image = np.clip(image * (1 + exposure_shift), 0, 255).astype(np.uint8)
+    
+    # Añadir ocasionalmente variación de contraste
+    if np.random.random() < 0.4:  # 40% de probabilidad
+        contrast_factor = np.random.uniform(0.8, 1.2)
+        mean = np.mean(image, axis=(0, 1), keepdims=True)
+        image = np.clip((image - mean) * contrast_factor + mean, 0, 255).astype(np.uint8)
 
     return image
 
