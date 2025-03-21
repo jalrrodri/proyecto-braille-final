@@ -56,32 +56,34 @@ def procesar_imagen(ruta_imagen, letra):
     img_procesada = img.copy()
     for i, (y1, y2, x1, x2) in enumerate(cuadrantes, start=1):
         roi = img[y1:y2, x1:x2]
+        
         if i in relieves:
-            # Ajuste de contraste usando CLAHE
-            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            # Filtros más suaves para cuadrantes en relieve
+            
+            # Mejora de contraste moderada usando CLAHE
+            clahe = cv2.createCLAHE(clipLimit=1.5, tileGridSize=(4, 4))
             roi = clahe.apply(roi)
             
-            # Reducción de ruido usando filtro Gaussiano
-            roi = cv2.GaussianBlur(roi, (5, 5), 0)
+            # Reducción de ruido suave
+            roi = cv2.GaussianBlur(roi, (3, 3), 0)
             
-            # Umbral adaptativo
-            blockSize = 1001  # Debe ser un número impar
-            C = 15  # Constante que se resta de la media o la media ponderada
-            roi = cv2.adaptiveThreshold(roi, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, C)
-            
-            # Alternativa: Umbral global simple
-            _, roi_global = cv2.threshold(roi, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            # Umbral adaptativo más moderado
+            blockSize = 101  # Reducido de 1001 para ser menos agresivo
+            C = 8  # Reducido de 15 para ser menos agresivo
+            roi = cv2.adaptiveThreshold(roi, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                       cv2.THRESH_BINARY, blockSize, C)
         else:
-            # Suavizar cuadrantes sin relieve
-            roi = cv2.GaussianBlur(roi, (5, 5), 0)
+            # Filtros mínimos para cuadrantes sin relieve
             
-            # Umbral adaptativo
-            blockSize = 3  # Debe ser un número impar
-            C = 100  # Constante que se resta de la media o la media ponderada
-            roi = cv2.adaptiveThreshold(roi, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blockSize, C)
+            # Suavizado ligero
+            roi = cv2.GaussianBlur(roi, (3, 3), 0)
             
-            # Alternativa: Umbral global simple
-            _, roi_global = cv2.threshold(roi, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            # Umbral adaptativo ligero
+            blockSize = 21  # Aumentado de 3 para ser menos agresivo
+            C = 12  # Reducido de 100 para ser menos extremo
+            roi = cv2.adaptiveThreshold(roi, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                                       cv2.THRESH_BINARY, blockSize, C)
+            
         img_procesada[y1:y2, x1:x2] = roi
     
     return img_procesada
