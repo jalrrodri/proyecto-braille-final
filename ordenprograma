@@ -7,3 +7,6 @@ aumentoDatosRuso.py
 aumentoDatosINCI.py
 generarCSV.py
 igualarEtiquetasCSV.py
+
+
+INFO: el dataset ruso no tiene letras V W X Y
