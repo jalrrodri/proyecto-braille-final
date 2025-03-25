@@ -205,24 +205,12 @@ def main():
 
     # Visualizar resultados
     for row_idx in range(rows):
+        # Visualizar resultados
         image_path = test_images[row_idx]
         image = cv2.imread(str(image_path))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         true_label = ground_truth.get(image_path.name, "Desconocido")
-
-        # Crear una copia de la imagen original y añadir la etiqueta verdadera
-        labeled_image = image.copy()
-        # Añadir texto con la etiqueta verdadera en la parte superior de la imagen
-        cv2.putText(
-            labeled_image,
-            f"Real: {true_label}",
-            (10, 30),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (255, 0, 0),
-            2,
-        )
 
         # Imagen original
         if rows == 1:
@@ -230,8 +218,10 @@ def main():
         else:
             ax = axes[row_idx, 0]
 
-        ax.imshow(labeled_image)
-        # Añadiremos el nombre de la imagen debajo de la imagen
+        ax.imshow(image)
+        # Añadir etiqueta verdadera como título
+        ax.set_title(f"Real: {true_label}", pad=10, color='red')
+        # Añadir nombre de la imagen debajo
         if image_path.name:
             ax.set_xlabel(f"Imagen: {image_path.name}", fontsize=8)
         ax.axis("off")
@@ -247,40 +237,18 @@ def main():
 
             # Añadir etiqueta verdadera a las imágenes de salida del modelo también
             result_img = result["annotated_image"].copy()
-            # Añadir texto con la etiqueta verdadera en la parte superior de la imagen (en rojo para diferenciar)
-            cv2.putText(
-                result_img,
-                f"Real: {true_label}",
-                (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.7,
-                (255, 0, 0),
-                2,
-            )
-
             ax.imshow(result_img)
             # Mostrar predicción y confianza como título
             correct = result["predicted_label"] == true_label
             title_color = "green" if correct else "red"
 
             ax.set_title(
-                f"Pred: {result['predicted_label']}\nConf: {result['confidence']:.2f}",
+                f"Real: {true_label} | Pred: {result['predicted_label']}\nConf: {result['confidence']:.2f}\n{'✓' if correct else '✗'}",
                 fontsize=10,
                 color=title_color,
+                pad=10,
             )
             ax.axis("off")
-
-            # Añadir indicador de coincidencia/no coincidencia
-            match_text = "✓" if correct else "✗"
-            ax.text(
-                0.5,
-                -0.1,
-                match_text,
-                fontsize=16,
-                color=title_color,
-                ha="center",
-                transform=ax.transAxes,
-            )
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.95, hspace=0.3)
