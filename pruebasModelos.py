@@ -243,7 +243,8 @@ def main():
             title_color = "green" if correct else "red"
 
             ax.set_title(
-                f"Real: {true_label} | Pred: {result['predicted_label']}\nConf: {result['confidence']:.2f}\n{'✓' if correct else '✗'}",
+                # f"Real: {true_label} | Pred: {result['predicted_label']}\nConf: {result['confidence']:.2f}\n{'✓' if correct else '✗'}",
+                f"Pred: {result['predicted_label']}\nConf: {result['confidence']:.2f}\n{'✓' if correct else '✗'}",
                 fontsize=10,
                 color=title_color,
                 pad=10,
