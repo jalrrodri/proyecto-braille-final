@@ -111,7 +111,7 @@ root_paths = [
 for root in root_paths:
     carpeta_de_entrada = root
     carpeta_de_salida = root + "/redimensionado"
-    archivo_csv_final = root + "/traducido/redimensionado/anotaciones/anotaciones.csv"
+    archivo_csv_final = root + "/redimensionado/anotaciones/anotaciones.csv"
 
     if os.path.exists(carpeta_de_entrada):
         # Procesar las imágenes y generar anotaciones
