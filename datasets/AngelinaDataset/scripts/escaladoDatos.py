@@ -66,9 +66,9 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
 
     with open(archivo_csv_salida, mode="w", newline="", encoding="utf-8") as csv_out:
         writer = csv.writer(csv_out)
-        writer.writerow(
-            ["ruta", "etiqueta", "xmin", "ymin", "xmax", "ymax"]
-        )  # Cabecera CSV
+        # writer.writerow(
+        #     ["ruta", "etiqueta", "xmin", "ymin", "xmax", "ymax"]
+        # )  # Cabecera CSV
 
         for archivo in os.listdir(carpeta_salida):
             if archivo.endswith("_resize.jpg") or archivo.endswith("_resize.png"):
@@ -79,7 +79,7 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
                 etiqueta = match.group(1) if match else "Unknown"
 
                 # Bounding box normalizado (asumiendo imagen cuadrada)
-                fila = [ruta_imagen, etiqueta, 0.1, 0.1, 0.9, 0.9]
+                fila = [ruta_imagen, etiqueta, 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9]
                 writer.writerow(fila)
 
     print(f"Anotaciones guardadas en {archivo_csv_salida}")
@@ -88,20 +88,21 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
 def procesar_dataset(carpeta_entrada, carpeta_salida, archivo_csv_salida):
     if not os.path.exists(carpeta_salida):
         os.makedirs(carpeta_salida)
-    
+
     for archivo in os.listdir(carpeta_entrada):
         if archivo.endswith(".jpg") or archivo.endswith(".png"):
             ruta_entrada = os.path.join(carpeta_entrada, archivo)
             redimensionar_imagen(ruta_entrada, carpeta_salida, archivo)
             print(f"Procesado: {archivo}")
-    
+
     # Generar archivo CSV con anotaciones
     generar_anotaciones_csv(carpeta_salida, archivo_csv_salida)
     print(f"Archivo CSV de anotaciones generado: {archivo_csv_salida}")
 
+
 # Lista de rutas raíz
 root_paths = [
-    "datasets/AngelinaDataset/books/chudo_derevo_redmi",
+    # "datasets/AngelinaDataset/books/chudo_derevo_redmi",
     "datasets/AngelinaDataset/books/mdd_cannon1",
     "datasets/AngelinaDataset/books/mdd-redmi1",
     "datasets/AngelinaDataset/books/ola",
