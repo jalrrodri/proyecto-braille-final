@@ -66,17 +66,37 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
 
     with open(archivo_csv_salida, mode="w", newline="", encoding="utf-8") as csv_out:
         writer = csv.writer(csv_out)
-        # writer.writerow(
-        #     ["ruta", "etiqueta", "xmin", "ymin", "xmax", "ymax"]
-        # )  # Cabecera CSV
 
         for archivo in os.listdir(carpeta_salida):
             if archivo.endswith("_resize.jpg") or archivo.endswith("_resize.png"):
                 ruta_imagen = os.path.join(carpeta_salida, archivo)
 
-                # Extraer etiqueta de manera segura
-                match = re.search(r"labeled_([A-Za-z0-9]+)_", archivo)
-                etiqueta = match.group(1) if match else "Unknown"
+                # Extraer etiqueta usando diferentes patrones
+                etiqueta = "Unknown"
+                patrones = [
+                    r"labeled_([A-Za-z0-9]+)_",  # Patrón original
+                    r"([A-Z])_\d+",  # Patrón para "A_1", "B_2", etc.
+                    r"([A-Z])\d+",  # Patrón para "A1", "B2", etc.
+                    r"([A-Z])\.jpg",  # Patrón para "A.jpg"
+                    r"([A-Z])_resize\.jpg",  # Patrón para "A_resize.jpg"
+                ]
+
+                nombre_archivo = os.path.basename(archivo)
+                for patron in patrones:
+                    match = re.search(patron, nombre_archivo)
+                    if match:
+                        etiqueta = match.group(1)
+                        break
+
+                # Si la etiqueta sigue siendo Unknown, intentar extraer la primera letra
+                if etiqueta == "Unknown":
+                    primera_letra = next(
+                        (c for c in nombre_archivo if c.isalpha()), None
+                    )
+                    if primera_letra and primera_letra.isupper():
+                        etiqueta = primera_letra
+
+                print(f"Archivo: {archivo}, Etiqueta detectada: {etiqueta}")  # Debug
 
                 # Bounding box normalizado (asumiendo imagen cuadrada)
                 fila = [ruta_imagen, etiqueta, 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9]
