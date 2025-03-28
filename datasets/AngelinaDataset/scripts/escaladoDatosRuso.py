@@ -7,19 +7,24 @@ from pathlib import Path
 
 def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
     # Leer la imagen
-    img = cv2.imread(str(ruta_imagen))
+    img = cv2.imread(ruta_imagen)
     if img is None:
         print(f"Error al leer {ruta_imagen}")
         return None
 
-    # Tamaño cuadrado objetivo (512x512 para efficientdet_lite3)
-    nuevo_tamano = 512
+    # Tamaño objetivo 384x512
+    TARGET_HEIGHT = 512
+    TARGET_WIDTH = 384
 
     # Obtener dimensiones originales
     alto, ancho = img.shape[:2]
 
-    # Escalar manteniendo proporción
-    escala = nuevo_tamano / max(alto, ancho)
+    # Calcular escalas para ancho y alto
+    escala_ancho = TARGET_WIDTH / ancho
+    escala_alto = TARGET_HEIGHT / alto
+    escala = min(escala_ancho, escala_alto)  # Usar la menor escala para mantener proporción
+
+    # Calcular nuevas dimensiones
     nuevo_ancho = int(ancho * escala)
     nuevo_alto = int(alto * escala)
 
@@ -28,13 +33,14 @@ def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
         img, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_LANCZOS4
     )
 
-    # Agregar padding para hacerla cuadrada
-    delta_ancho = nuevo_tamano - nuevo_ancho
-    delta_alto = nuevo_tamano - nuevo_alto
+    # Calcular padding necesario
+    delta_ancho = TARGET_WIDTH - nuevo_ancho
+    delta_alto = TARGET_HEIGHT - nuevo_alto
     top, bottom = delta_alto // 2, delta_alto - (delta_alto // 2)
     left, right = delta_ancho // 2, delta_ancho - (delta_ancho // 2)
 
-    imagen_cuadrada = cv2.copyMakeBorder(
+    # Agregar padding para alcanzar 384x512
+    imagen_final = cv2.copyMakeBorder(
         imagen_redimensionada,
         top,
         bottom,
@@ -45,9 +51,9 @@ def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
     )
 
     # Guardar imagen
-    nombre_base = Path(archivo).stem
-    ruta_salida = carpeta_salida / f"{nombre_base}_resize.jpg"
-    cv2.imwrite(str(ruta_salida), imagen_cuadrada, [cv2.IMWRITE_JPEG_QUALITY, 95])
+    nombre_base = os.path.splitext(archivo)[0]
+    ruta_salida = os.path.join(carpeta_salida, f"{nombre_base}_resize.jpg")
+    cv2.imwrite(ruta_salida, imagen_final, [cv2.IMWRITE_JPEG_QUALITY, 95])
 
     return ruta_salida
 
@@ -64,12 +70,9 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
         for archivo in carpeta_salida.glob("*_resize.jp*g"):
             nombre_archivo = archivo.name
             
-            # Extraer etiqueta del nombre del archivo
-            etiqueta = None
-            nombre_base = nombre_archivo.split('_')[0]  # Tomar la primera parte antes del _
-            
-            if len(nombre_base) == 1 and nombre_base.isalpha():
-                etiqueta = nombre_base.upper()
+            # Extraer etiqueta usando el patrón labeled_X_
+            match = re.search(r'labeled_([A-Za-z0-9])_', nombre_archivo)
+            etiqueta = match.group(1).upper() if match else None
             
             if etiqueta:
                 print(f"Archivo: {nombre_archivo}, Etiqueta detectada: {etiqueta}")
