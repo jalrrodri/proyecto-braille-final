@@ -3,22 +3,16 @@ import numpy as np
 import os
 import re
 import csv
-
-import cv2
-import os
-import csv
-import re
-import numpy as np
-
+from pathlib import Path
 
 def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
     # Leer la imagen
-    img = cv2.imread(ruta_imagen)
+    img = cv2.imread(str(ruta_imagen))
     if img is None:
         print(f"Error al leer {ruta_imagen}")
         return None
 
-    # Tamaño cuadrado objetivo (ej. 512x512 para efficientdet_lite3)
+    # Tamaño cuadrado objetivo (512x512 para efficientdet_lite3)
     nuevo_tamano = 512
 
     # Obtener dimensiones originales
@@ -51,78 +45,73 @@ def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
     )
 
     # Guardar imagen
-    nombre_base = os.path.splitext(archivo)[0]
-    ruta_salida = os.path.join(carpeta_salida, f"{nombre_base}_resize.jpg")
-    cv2.imwrite(ruta_salida, imagen_cuadrada, [cv2.IMWRITE_JPEG_QUALITY, 95])
+    nombre_base = Path(archivo).stem
+    ruta_salida = carpeta_salida / f"{nombre_base}_resize.jpg"
+    cv2.imwrite(str(ruta_salida), imagen_cuadrada, [cv2.IMWRITE_JPEG_QUALITY, 95])
 
     return ruta_salida
 
-
 def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
     # Crear carpeta si no existe
-    carpeta_anotaciones = os.path.dirname(archivo_csv_salida)
-    if not os.path.exists(carpeta_anotaciones):
-        os.makedirs(carpeta_anotaciones)
+    archivo_csv_salida.parent.mkdir(parents=True, exist_ok=True)
 
     with open(archivo_csv_salida, mode="w", newline="", encoding="utf-8") as csv_out:
         writer = csv.writer(csv_out)
+        
+        # Escribir encabezado
+        writer.writerow(['filename', 'label', 'xmin', 'ymin', 'xmax', 'ymax'])
 
-        for archivo in os.listdir(carpeta_salida):
-            if archivo.endswith("_resize.jpg") or archivo.endswith("_resize.png"):
-                ruta_imagen = os.path.join(carpeta_salida, archivo)
-
-                # Extraer etiqueta usando diferentes patrones
-                etiqueta = "Unknown"
-                patrones = [
-                    r"labeled_([A-Za-z0-9]+)_",  # Patrón original
-                    r"([A-Z])_\d+",  # Patrón para "A_1", "B_2", etc.
-                    r"([A-Z])\d+",  # Patrón para "A1", "B2", etc.
-                    r"([A-Z])\.jpg",  # Patrón para "A.jpg"
-                    r"([A-Z])_resize\.jpg",  # Patrón para "A_resize.jpg"
-                ]
-
-                nombre_archivo = os.path.basename(archivo)
-                for patron in patrones:
-                    match = re.search(patron, nombre_archivo)
-                    if match:
-                        etiqueta = match.group(1)
-                        break
-
-                # Si la etiqueta sigue siendo Unknown, intentar extraer la primera letra
-                if etiqueta == "Unknown":
-                    primera_letra = next(
-                        (c for c in nombre_archivo if c.isalpha()), None
-                    )
-                    if primera_letra and primera_letra.isupper():
-                        etiqueta = primera_letra
-
-                print(f"Archivo: {archivo}, Etiqueta detectada: {etiqueta}")  # Debug
-
-                # Bounding box normalizado (asumiendo imagen cuadrada)
-                fila = [ruta_imagen, etiqueta, 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9]
+        for archivo in carpeta_salida.glob("*_resize.jp*g"):
+            nombre_archivo = archivo.name
+            
+            # Extraer etiqueta del nombre del archivo
+            etiqueta = None
+            nombre_base = nombre_archivo.split('_')[0]  # Tomar la primera parte antes del _
+            
+            if len(nombre_base) == 1 and nombre_base.isalpha():
+                etiqueta = nombre_base.upper()
+            
+            if etiqueta:
+                print(f"Archivo: {nombre_archivo}, Etiqueta detectada: {etiqueta}")
+                
+                # Bounding box normalizado (centrado en la imagen)
+                fila = [str(archivo), etiqueta, 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9]
                 writer.writerow(fila)
+            else:
+                print(f"No se pudo detectar etiqueta para: {nombre_archivo}")
 
     print(f"Anotaciones guardadas en {archivo_csv_salida}")
 
-
-def procesar_dataset(carpeta_entrada, carpeta_salida, archivo_csv_salida):
-    if not os.path.exists(carpeta_salida):
-        os.makedirs(carpeta_salida)
-
-    for archivo in os.listdir(carpeta_entrada):
-        if archivo.endswith(".jpg") or archivo.endswith(".png"):
-            ruta_entrada = os.path.join(carpeta_entrada, archivo)
-            redimensionar_imagen(ruta_entrada, carpeta_salida, archivo)
-            print(f"Procesado: {archivo}")
-
-    # Generar archivo CSV con anotaciones
-    generar_anotaciones_csv(carpeta_salida, archivo_csv_salida)
-    print(f"Archivo CSV de anotaciones generado: {archivo_csv_salida}")
-
+def procesar_dataset(root_path):
+    root_path = Path(root_path)
+    
+    # Definir las carpetas de entrada y salida
+    subcarpetas = ['separado', 'filtros', 'aumentoDatos']
+    
+    for subcarpeta in subcarpetas:
+        carpeta_entrada = root_path / "traducido" / subcarpeta
+        carpeta_salida = root_path / "traducido" / "redimensionado" / subcarpeta
+        archivo_csv_salida = carpeta_salida / "anotaciones/anotaciones.csv"
+        
+        if not carpeta_entrada.exists():
+            print(f"La carpeta {carpeta_entrada} no existe. Continuando...")
+            continue
+            
+        # Crear carpeta de salida si no existe
+        carpeta_salida.mkdir(parents=True, exist_ok=True)
+        
+        # Procesar imágenes
+        for archivo in carpeta_entrada.glob("*.jp*g"):
+            redimensionar_imagen(archivo, carpeta_salida, archivo.name)
+            print(f"Procesado: {archivo.name}")
+        
+        # Generar anotaciones
+        generar_anotaciones_csv(carpeta_salida, archivo_csv_salida)
+        print(f"Archivo CSV de anotaciones generado: {archivo_csv_salida}")
 
 # Lista de rutas raíz
 root_paths = [
-    # "datasets/AngelinaDataset/books/chudo_derevo_redmi",
+    "datasets/AngelinaDataset/books/chudo_derevo_redmi",
     "datasets/AngelinaDataset/books/mdd_cannon1",
     "datasets/AngelinaDataset/books/mdd-redmi1",
     "datasets/AngelinaDataset/books/ola",
@@ -131,49 +120,10 @@ root_paths = [
     "datasets/AngelinaDataset/books/uploaded",
     "datasets/AngelinaDataset/handwritten/ang_redmi",
     "datasets/AngelinaDataset/handwritten/kov",
-    "datasets/AngelinaDataset/handwritten/uploaded"
+    "datasets/AngelinaDataset/handwritten/uploaded",
 ]
-# Subcarpetas a procesar
-subcarpetas = ["/traducido/aumentoDatos", "/traducido/filtros", "/traducido/separado"]
 
-# Ejecutar la función para cada ruta raíz y subcarpeta
+# Ejecutar la función para cada ruta raíz
 for root in root_paths:
-    # Crear una lista para almacenar todas las anotaciones
-    todas_anotaciones = []
-
-    for subcarpeta in subcarpetas:
-        carpeta_de_entrada = root + subcarpeta
-        carpeta_de_salida = root + "/traducido/redimensionado"
-        archivo_csv_temporal = (
-            root
-            + f"/traducido/redimensionado/anotaciones/anotaciones_{subcarpeta.split('/')[-1]}.csv"
-        )
-
-        if os.path.exists(carpeta_de_entrada):
-            # Procesar las imágenes
-            procesar_dataset(
-                carpeta_de_entrada, carpeta_de_salida, archivo_csv_temporal
-            )
-
-            # Leer las anotaciones generadas y agregarlas a la lista
-            if os.path.exists(archivo_csv_temporal):
-                with open(archivo_csv_temporal, mode="r", encoding="utf-8") as csv_in:
-                    reader = csv.reader(csv_in)
-                    todas_anotaciones.extend(list(reader))
-
-                # Eliminar el archivo CSV temporal
-                os.remove(archivo_csv_temporal)
-
-    # Escribir todas las anotaciones en un único archivo CSV
-    archivo_csv_final = (
-        root + "/traducido/redimensionado/anotaciones/anotaciones_combinadas.csv"
-    )
-    carpeta_anotaciones = os.path.dirname(archivo_csv_final)
-    if not os.path.exists(carpeta_anotaciones):
-        os.makedirs(carpeta_anotaciones)
-
-    with open(archivo_csv_final, mode="w", newline="", encoding="utf-8") as csv_out:
-        writer = csv.writer(csv_out)
-        writer.writerows(todas_anotaciones)
-
-    print(f"Archivo CSV combinado generado: {archivo_csv_final}")
+    print(f"\nProcesando {root}...")
+    procesar_dataset(root)
