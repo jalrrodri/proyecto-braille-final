@@ -9,7 +9,7 @@ import os
 import csv
 import re
 import numpy as np
-from pathlib import Path 
+from pathlib import Path
 
 
 def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
@@ -27,16 +27,14 @@ def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
 
     # Calcular escala basada solo en la altura
     escala = TARGET_HEIGHT / alto
-    
+
     # Calcular nuevo ancho manteniendo la relación de aspecto
     nuevo_ancho = int(ancho * escala)
     nuevo_alto = TARGET_HEIGHT
 
     # Redimensionar manteniendo la relación de aspecto
     imagen_final = cv2.resize(
-        img, 
-        (nuevo_ancho, nuevo_alto), 
-        interpolation=cv2.INTER_LANCZOS4
+        img, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_LANCZOS4
     )
 
     # Guardar imagen
@@ -51,26 +49,26 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
     # Convert string paths to Path objects
     carpeta_salida = Path(carpeta_salida)
     archivo_csv_salida = Path(archivo_csv_salida)
-    
+
     # Create directory if it doesn't exist
     archivo_csv_salida.parent.mkdir(parents=True, exist_ok=True)
 
     with open(archivo_csv_salida, mode="w", newline="", encoding="utf-8") as csv_out:
         writer = csv.writer(csv_out)
-        
+
         # # Write header
         # writer.writerow(['filename', 'label', 'xmin', 'ymin', 'xmax', 'ymax'])
 
         for archivo in carpeta_salida.glob("*_resize.jp*g"):
             nombre_archivo = archivo.name
-            
+
             # Extract first letter of filename as label
             etiqueta = nombre_archivo[0].upper()
-            
+
             print(f"Archivo: {nombre_archivo}, Etiqueta detectada: {etiqueta}")
-            
+
             # Normalized bounding box (centered in image)
-            fila = [str(archivo), etiqueta, 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9]
+            fila = [str(archivo), etiqueta, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]
             writer.writerow(fila)
 
 
@@ -93,7 +91,7 @@ def procesar_dataset(carpeta_entrada, carpeta_salida, archivo_csv_salida):
 root_paths = [
     "datasets/libroINCI/datasetprueba1",
     "datasets/libroINCI/datasetprueba1AUMENTODATOS",
-    "datasets/libroINCI/datasetprueba1FILTROS"
+    "datasets/libroINCI/datasetprueba1FILTROS",
 ]
 
 # Ejecutar la función para cada ruta raíz
