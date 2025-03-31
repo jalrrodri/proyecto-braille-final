@@ -64,8 +64,8 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
     with open(archivo_csv_salida, mode="w", newline="", encoding="utf-8") as csv_out:
         writer = csv.writer(csv_out)
         
-        # Escribir encabezado
-        writer.writerow(['filename', 'label', 'xmin', 'ymin', 'xmax', 'ymax'])
+        # # Escribir encabezado
+        # writer.writerow(['filename', 'label', 'xmin', 'ymin', 'xmax', 'ymax'])
 
         for archivo in carpeta_salida.glob("*_resize.jp*g"):
             nombre_archivo = archivo.name
