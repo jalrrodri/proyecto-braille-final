@@ -19,42 +19,24 @@ def redimensionar_imagen(ruta_imagen, carpeta_salida, archivo):
         print(f"Error al leer {ruta_imagen}")
         return None
 
-    # Tamaño objetivo 512x384
+    # Solo definimos altura objetivo
     TARGET_HEIGHT = 512
-    TARGET_WIDTH = 384
 
     # Obtener dimensiones originales
     alto, ancho = img.shape[:2]
 
-    # Calcular escalas para ancho y alto
-    escala_ancho = TARGET_WIDTH / ancho
-    escala_alto = TARGET_HEIGHT / alto
-    escala = min(escala_ancho, escala_alto)  # Usar la menor escala para mantener proporción
-
-    # Calcular nuevas dimensiones
+    # Calcular escala basada solo en la altura
+    escala = TARGET_HEIGHT / alto
+    
+    # Calcular nuevo ancho manteniendo la relación de aspecto
     nuevo_ancho = int(ancho * escala)
-    nuevo_alto = int(alto * escala)
+    nuevo_alto = TARGET_HEIGHT
 
-    # Redimensionar sin distorsión
-    imagen_redimensionada = cv2.resize(
-        img, (nuevo_ancho, nuevo_alto), interpolation=cv2.INTER_LANCZOS4
-    )
-
-    # Calcular padding necesario
-    delta_ancho = TARGET_WIDTH - nuevo_ancho
-    delta_alto = TARGET_HEIGHT - nuevo_alto
-    top, bottom = delta_alto // 2, delta_alto - (delta_alto // 2)
-    left, right = delta_ancho // 2, delta_ancho - (delta_ancho // 2)
-
-    # Agregar padding para alcanzar 384x512
-    imagen_final = cv2.copyMakeBorder(
-        imagen_redimensionada,
-        top,
-        bottom,
-        left,
-        right,
-        cv2.BORDER_CONSTANT,
-        value=[128, 128, 128],
+    # Redimensionar manteniendo la relación de aspecto
+    imagen_final = cv2.resize(
+        img, 
+        (nuevo_ancho, nuevo_alto), 
+        interpolation=cv2.INTER_LANCZOS4
     )
 
     # Guardar imagen
