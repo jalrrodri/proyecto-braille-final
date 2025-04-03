@@ -54,3 +54,4 @@ https://cloud.google.com/vertex-ai/docs/beginner/beginners-guide?hl=es-419
 https://ai.google.dev/edge/mediapipe/solutions/customization/object_detector
 https://www.kaggle.com/models?query=image+object+detection&framework=tfLite
 https://ai.google.dev/edge/litert/migration
+https://universe.roboflow.com/nicco-van-hamja-b1vxy/braillify
