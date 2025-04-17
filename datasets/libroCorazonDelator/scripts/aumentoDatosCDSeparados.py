@@ -3,7 +3,23 @@ import numpy as np
 import os
 import re
 import csv
-from keras.preprocessing.image import ImageDataGenerator, img_to_array, array_to_img, load_img
+try:
+    # For newer TensorFlow installations (like on your PC)
+    from tensorflow.keras.preprocessing.image import (
+        ImageDataGenerator,
+        img_to_array,
+        array_to_img,
+        load_img,
+    )
+except ImportError:
+    # For systems with standalone keras installed (like your Ubuntu workstation)
+    from keras.preprocessing.image import (
+        ImageDataGenerator,
+        img_to_array,
+        array_to_img,
+        load_img,
+    )
+
 
 # Función para realizar aumento de datos
 def procesar_imagen(ruta_imagen, carpeta_salida, archivo):
@@ -88,14 +104,24 @@ def generar_anotaciones_csv(carpeta_salida, archivo_csv_salida):
     if not os.path.exists(carpeta_anotaciones):
         os.makedirs(carpeta_anotaciones)
 
-    with open(archivo_csv_salida, mode='w', newline='', encoding='utf-8') as csv_out:
+    with open(archivo_csv_salida, mode="w", newline="", encoding="utf-8") as csv_out:
         writer = csv.writer(csv_out)
         for archivo in os.listdir(carpeta_salida):
             if archivo.endswith(".jpg") or archivo.endswith(".png"):
                 ruta_imagen = os.path.join(carpeta_salida, archivo)
-                etiqueta = re.search(r'labeled_([A-Z])_', archivo).group(1)
-                fila = [ruta_imagen, etiqueta, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]
-                writer.writerow(fila)
+                # Obtener la primera letra del nombre del archivo
+                nombre_base = os.path.splitext(archivo)[
+                    0
+                ]  # Obtiene el nombre sin extensión
+                primera_letra = nombre_base[0]  # Toma el primer carácter
+                # Verifica que sea una letra y la convierte a mayúscula
+                if primera_letra.isalpha():
+                    etiqueta = primera_letra.upper()
+                    fila = [ruta_imagen, etiqueta, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]
+                    writer.writerow(fila)
+                    print(f"Archivo: {archivo}, Etiqueta detectada: {etiqueta}")
+                else:
+                    print(f"No se pudo detectar etiqueta válida para: {archivo}")
 
 def procesar_dataset(carpeta_entrada, carpeta_salida, archivo_csv_salida):
     if not os.path.exists(carpeta_salida):

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>completas</folder>
+	<filename>20250417_125228.jpg</filename>
+	<path>D:\ProyectoDeGrado\proyecto-braille-final\datasets\libroCorazonDelator\completas\20250417_125228.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>3060</width>
+		<height>4080</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>M</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>73</xmin>
+			<ymin>435</ymin>
+			<xmax>239</xmax>
+			<ymax>693</ymax>
+		</bndbox>
+	</object>
+</annotation>

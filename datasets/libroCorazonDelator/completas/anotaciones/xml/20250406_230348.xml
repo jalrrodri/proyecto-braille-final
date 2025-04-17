@@ -1,38 +1,26 @@
 <annotation>
 	<folder>completas</folder>
-	<filename>20250406_234619.jpg</filename>
-	<path>D:\ProyectoDeGrado\proyecto-braille-final\datasets\libroCorazonDelator\completas\20250406_234619.jpg</path>
+	<filename>20250406_230348.jpg</filename>
+	<path>D:\ProyectoDeGrado\proyecto-braille-final\datasets\libroCorazonDelator\completas\20250406_230348.jpg</path>
 	<source>
 		<database>Unknown</database>
 	</source>
 	<size>
-		<width>1932</width>
-		<height>2576</height>
+		<width>6120</width>
+		<height>8160</height>
 		<depth>3</depth>
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>Q</name>
+		<name>T</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>791</xmin>
-			<ymin>1912</ymin>
-			<xmax>949</xmax>
-			<ymax>2161</ymax>
-		</bndbox>
-	</object>
-	<object>
-		<name>P</name>
-		<pose>Unspecified</pose>
-		<truncated>0</truncated>
-		<difficult>0</difficult>
-		<bndbox>
-			<xmin>1416</xmin>
-			<ymin>1921</ymin>
-			<xmax>1581</xmax>
-			<ymax>2167</ymax>
+			<xmin>2255</xmin>
+			<ymin>5457</ymin>
+			<xmax>2710</xmax>
+			<ymax>6085</ymax>
 		</bndbox>
 	</object>
 	<object>
@@ -41,46 +29,58 @@
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>1621</xmin>
-			<ymin>1911</ymin>
-			<xmax>1777</xmax>
-			<ymax>2186</ymax>
+			<xmin>2773</xmin>
+			<ymin>5475</ymin>
+			<xmax>3146</xmax>
+			<ymax>6103</ymax>
 		</bndbox>
 	</object>
 	<object>
-		<name>U</name>
+		<name>R</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>993</xmin>
-			<ymin>1911</ymin>
-			<xmax>1168</xmax>
-			<ymax>2163</ymax>
+			<xmin>1782</xmin>
+			<ymin>5439</ymin>
+			<xmax>2119</xmax>
+			<ymax>6103</ymax>
 		</bndbox>
 	</object>
 	<object>
-		<name>L</name>
+		<name>S</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>1213</xmin>
-			<ymin>875</ymin>
-			<xmax>1383</xmax>
-			<ymax>1145</ymax>
+			<xmin>2719</xmin>
+			<ymin>2175</ymin>
+			<xmax>3055</xmax>
+			<ymax>2821</ymax>
 		</bndbox>
 	</object>
 	<object>
-		<name>L</name>
+		<name>B</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>1413</xmin>
-			<ymin>881</ymin>
-			<xmax>1583</xmax>
-			<ymax>1151</ymax>
+			<xmin>1201</xmin>
+			<ymin>2175</ymin>
+			<xmax>1601</xmax>
+			<ymax>2766</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>C</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1191</xmin>
+			<ymin>1321</ymin>
+			<xmax>1610</xmax>
+			<ymax>1948</ymax>
 		</bndbox>
 	</object>
 </annotation>

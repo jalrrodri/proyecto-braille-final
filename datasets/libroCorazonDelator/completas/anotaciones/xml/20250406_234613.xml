@@ -1,7 +1,7 @@
 <annotation>
 	<folder>completas</folder>
-	<filename>20250406_234618.jpg</filename>
-	<path>D:\ProyectoDeGrado\proyecto-braille-final\datasets\libroCorazonDelator\completas\20250406_234618.jpg</path>
+	<filename>20250406_234613.jpg</filename>
+	<path>D:\ProyectoDeGrado\proyecto-braille-final\datasets\libroCorazonDelator\completas\20250406_234613.jpg</path>
 	<source>
 		<database>Unknown</database>
 	</source>
@@ -12,27 +12,39 @@
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>D</name>
+		<name>G</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>495</xmin>
-			<ymin>1659</ymin>
-			<xmax>655</xmax>
-			<ymax>1918</ymax>
+			<xmin>838</xmin>
+			<ymin>2108</ymin>
+			<xmax>984</xmax>
+			<ymax>2345</ymax>
 		</bndbox>
 	</object>
 	<object>
-		<name>P</name>
+		<name>V</name>
+		<pose>Unspecified</pose>
+		<truncated>1</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1772</xmin>
+			<ymin>1805</ymin>
+			<xmax>1932</xmax>
+			<ymax>2051</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>T</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>484</xmin>
-			<ymin>2016</ymin>
+			<xmin>473</xmin>
+			<ymin>1169</ymin>
 			<xmax>649</xmax>
-			<ymax>2270</ymax>
+			<ymax>1418</ymax>
 		</bndbox>
 	</object>
 	<object>
@@ -41,10 +53,10 @@
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>1356</xmin>
-			<ymin>1294</ymin>
-			<xmax>1526</xmax>
-			<ymax>1567</ymax>
+			<xmin>108</xmin>
+			<ymin>880</ymin>
+			<xmax>262</xmax>
+			<ymax>1110</ymax>
 		</bndbox>
 	</object>
 	<object>
@@ -53,10 +65,10 @@
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>1124</xmin>
-			<ymin>1306</ymin>
-			<xmax>1294</xmax>
-			<ymax>1579</ymax>
+			<xmin>1761</xmin>
+			<ymin>1191</ymin>
+			<xmax>1915</xmax>
+			<ymax>1421</ymax>
 		</bndbox>
 	</object>
 </annotation>
